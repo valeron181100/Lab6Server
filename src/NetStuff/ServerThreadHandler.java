@@ -41,7 +41,8 @@ public class ServerThreadHandler implements Runnable {
         }
     }
 
-    public void read(SelectionKey key){
+
+    private void read(SelectionKey key){
         DatagramChannel channel = (DatagramChannel) key.channel();
         Client client = (Client) key.attachment();
         buffer.clear();
@@ -95,13 +96,16 @@ public class ServerThreadHandler implements Runnable {
         }
     }
 
-    public void write(SelectionKey key){
-        DatagramChannel channel = (DatagramChannel) key.channel();
+    private void write(SelectionKey key){
+        try {
+        DatagramChannel channel = DatagramChannel.open();
+        channel.configureBlocking(false);
+        channel.bind(null);
         Client client = (Client) key.attachment();
 
         buffer.flip();
 
-        try {
+
             if(client.getaPackage() != null)
                 channel.send(ByteBuffer.wrap(client.getaPackage().getBytes()), client.getAdress());
             else
