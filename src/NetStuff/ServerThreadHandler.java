@@ -3,6 +3,7 @@ package NetStuff;
 import FileSystem.CollectionManager;
 import FileSystem.Command;
 import FileSystem.EmptyFileException;
+import javafx.util.Pair;
 import mainpkg.Main;
 
 import java.io.ByteArrayInputStream;
@@ -12,13 +13,16 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class ServerThreadHandler implements Runnable {
 
     /**
      * Буфер для получения и отправки байтов
      */
-    private ByteBuffer buffer = ByteBuffer.allocate(Integer.MAX_VALUE/16);
+    private ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     private SocketAddress templeAdress = null;
 
@@ -41,6 +45,32 @@ public class ServerThreadHandler implements Runnable {
         }
     }
 
+    private Pair<SocketAddress, byte[]> recievePackage() throws IOException{
+        DatagramChannel channel = DatagramChannel.open();
+        channel.configureBlocking(false);
+        channel.bind(null);
+        int i = 0;
+        ArrayList<byte[]> bytesList = new ArrayList<>();
+        SocketAddress socketAddress;
+        byte[] recieved;
+        do {
+            buffer.clear();
+            SocketAddress address = channel.receive(buffer);
+            socketAddress = address;
+            recieved = buffer.array();
+            bytesList.add(Arrays.copyOfRange(recieved,2, recieved.length-1));
+            channel.send(ByteBuffer.wrap(new byte[]{1}), address);
+        }while(recieved[0] != recieved[1]);
+        byte[] fBytes = new byte[0];
+        for (byte[] bytes : bytesList){
+            int bIndex = fBytes.length;
+            fBytes = new byte[fBytes.length + bytes.length];
+            System.arraycopy(bytes, 0, fBytes, bIndex, bytes.length);
+        }
+
+        return new Pair<>(socketAddress, fBytes);
+
+    }
 
     private void read(SelectionKey key){
         DatagramChannel channel = (DatagramChannel) key.channel();
