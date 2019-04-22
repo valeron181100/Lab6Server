@@ -276,10 +276,17 @@ public enum Command {
         String[] lpArgs = logPas.split("\\|");
         User user = new User(lpArgs[0], lpArgs[1]);
         user.setLoggedIn(true);
-        GlobalVariables.users.put(user, command.getAddress());
-        command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
-                new byte[]{1})));
-        GlobalVariables.users.forEach((k,v)-> System.out.println(k.toString()));
+        if (UsersVariables.users.containsKey(user)){
+            command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                    new byte[]{2})));
+        }
+        else {
+            UsersVariables.users.put(user, command.getAddress());
+            command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                    new byte[]{1})));
+        }
+
+        UsersVariables.users.forEach((k,v)-> System.out.println(k.toString()));
     }));
 
     Command(ICommand cmd){

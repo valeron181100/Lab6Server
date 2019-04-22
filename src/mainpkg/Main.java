@@ -5,6 +5,7 @@ import Clothes.TopClothes;
 import FileSystem.CollectionManager;
 import FileSystem.Command;
 import FileSystem.EmptyFileException;
+import FileSystem.UsersVariables;
 import NetStuff.Client;
 import NetStuff.ServerThreadHandler;
 import NetStuff.TransferCommandID;
@@ -21,6 +22,8 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class Main {
@@ -30,7 +33,11 @@ public class Main {
     public static final String DEFAULT_CHAR_SET = "UTF-8";
 
     public static void main(String[] args) {
+
+        Runtime.getRuntime().addShutdownHook(new Thread(UsersVariables::saveUsers));
+
         try {
+            UsersVariables.restoreUsers();
             if(args.length == 0){
                 System.out.println("Введите порт!");
                 System.exit(0);
