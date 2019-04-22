@@ -23,7 +23,7 @@ public class ServerThreadHandler implements Runnable {
     /**
      * Буфер для получения и отправки байтов
      */
-    private ByteBuffer buffer = ByteBuffer.allocate(1024);
+    private ByteBuffer buffer = ByteBuffer.allocate(Integer.MAX_VALUE/16);
 
     private SocketAddress templeAdress = null;
 
@@ -46,56 +46,15 @@ public class ServerThreadHandler implements Runnable {
         }
     }
 
-    private Pair<SocketAddress, byte[]> recievePackage(DatagramChannel mainChannel) throws IOException{
-        int i = 0;
-        ArrayList<byte[]> bytesList = new ArrayList<>();
-        SocketAddress socketAddress;
-        byte[] recieved;
-        do {
-            buffer.clear();
-            SocketAddress address = mainChannel.receive(buffer);
-            socketAddress = address;
-            recieved = buffer.array();
-            bytesList.add(Arrays.copyOfRange(recieved,2, recieved.length-1));
-        }while(recieved[0] != recieved[1]);
-
-        ArrayList<Byte> byteArrayList = new ArrayList<>();
-        for (byte[] subBytes : bytesList){ ///Переделать тело цикла
-            List<Byte> byteList = new ArrayList<>();
-            for (int j = 0; j < subBytes.length; j++) {
-                byteList.add(subBytes[j]);
-            }
-            byteArrayList.addAll(byteList);
-        }
-        byte[] fBytes = new byte[byteArrayList.size()];
-        for (int j = 0; j < fBytes.length; j++) {
-            fBytes[j] = byteArrayList.get(j);
-        }
-
-        /*byte[] fBytes = new byte[0];
-        for (byte[] bytes : bytesList){ ///Переделать тело цикла
-            int bIndex = fBytes.length;
-            byte[] tBytes = fBytes;
-            fBytes = new byte[fBytes.length + bytes.length];
-            System.arraycopy(tBytes, 0, fBytes, 0, tBytes.length);
-            System.arraycopy(bytes, 0, fBytes, tBytes.length, bytes.length);
-        }*/
-
-        return new Pair<>(socketAddress, fBytes);
-
-    }
-
     private void read(SelectionKey key){
         DatagramChannel channel = (DatagramChannel) key.channel();
         Client client = (Client) key.attachment();
         buffer.clear();
 
         try {
-            Pair<SocketAddress, byte[]> socketAddressPair = recievePackage(channel);
-            SocketAddress adress = socketAddressPair.getKey();
-            //SocketAddress adress = channel.receive(buffer);
+            SocketAddress adress = channel.receive(buffer);
             client.setAdress(adress);
-            TransferPackage recieved = TransferPackage.restoreObject(new ByteArrayInputStream(socketAddressPair.getValue()));
+            TransferPackage recieved = TransferPackage.restoreObject(new ByteArrayInputStream(buffer.array()));
             if(recieved.getId() == TransferCommandID.CheckingConnectionTP.getId()){
                 client.setaPackage(recieved);
                 key.interestOps(SelectionKey.OP_WRITE);
