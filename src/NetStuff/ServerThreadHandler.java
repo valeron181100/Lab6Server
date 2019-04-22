@@ -56,7 +56,7 @@ public class ServerThreadHandler implements Runnable {
                 key.interestOps(SelectionKey.OP_WRITE);
                 return;
             }
-            if (recieved.getAdditionalData() != null)
+            if (recieved.getAdditionalData() != null && recieved.getId() != 110)
                 recieved.setData(CollectionManager.getCollectionFromXML(new String(recieved.getAdditionalData(), Main.DEFAULT_CHAR_SET)).stream());
             Command command = Command.parseCmd(recieved.getCmdData().trim());
             if(command == null)
@@ -66,6 +66,7 @@ public class ServerThreadHandler implements Runnable {
                     client.setaPackage(new TransferPackage(-1, "Неверная команда!", null));
                 }
                 else {
+                    command.setAddress(adress);
                     client.setaPackage(command.start(command, recieved));
                 }
             }

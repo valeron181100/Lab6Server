@@ -3,12 +3,14 @@ package FileSystem;
 import Clothes.Costume;
 import NetStuff.TransferPackage;
 
+import NetStuff.User;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import mainpkg.Main;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -268,7 +270,17 @@ public enum Command {
         command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null,
                 CollectionManager.getXmlFromCollection(collection).getBytes(Main.DEFAULT_CHAR_SET))));
         System.out.println("Команда выполнена.");
-    });     ///Done
+    }),     ///Done
+    LOGIN(((command, transferPackage) -> {
+        String logPas = new String(transferPackage.getAdditionalData(), Main.DEFAULT_CHAR_SET);
+        String[] lpArgs = logPas.split("\\|");
+        User user = new User(lpArgs[0], lpArgs[1]);
+        user.setLoggedIn(true);
+        GlobalVariables.users.put(user, command.getAddress());
+        command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                new byte[]{1})));
+        GlobalVariables.users.forEach((k,v)-> System.out.println(k.toString()));
+    }));
 
     Command(ICommand cmd){
         this.cmd = cmd;
@@ -280,7 +292,8 @@ public enum Command {
     /**Данные, с которыми оперирует команда.*/
     private Stream data;
 
-    private TransferPackage sendingPackage;
+    /**Адресс пользователя, заприсившего выполнения команды*/
+    private SocketAddress address;
 
     private void setData(Stream data) {
         this.data = data;
@@ -295,7 +308,7 @@ public enum Command {
 
         String jsonRegex = "{\"topClothes\":{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"T-Shirt\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"Trousers\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Panties\",\"is_for_man\":(true|false)},\"hat\":{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"BaseballHat\",\"is_for_man\":(true|false)},\"shoes\":{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Sneackers\",\"is_for_man\":(true|false)}}";
         String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.}";
-        String nodataCommandRegex = "show|load|info|start|exit|help";
+        String nodataCommandRegex = "show|load|info|start|exit|help|login";
 
         if(jsonInput.matches(dataCommandRegex)){
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();
@@ -346,6 +359,15 @@ public enum Command {
 //            }
 //        }
 
+    }
+
+
+    public void setAddress(SocketAddress address) {
+        this.address = address;
+    }
+
+    public SocketAddress getAddress() {
+        return address;
     }
 
     /**
