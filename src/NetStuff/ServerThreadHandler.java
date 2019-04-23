@@ -90,6 +90,7 @@ public class ServerThreadHandler implements Runnable {
                 }
                 else {
                     command.setAddress(adress);
+                    command.setObjectsHashSet(objectsHashSet);
                     client.setaPackage(command.start(command, recieved));
                 }
             }

@@ -5,6 +5,7 @@ import NetStuff.TransferPackage;
 
 import NetStuff.User;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import javafx.util.Pair;
 import mainpkg.Main;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -307,6 +308,8 @@ public enum Command {
     /**Тело выполняемой команды.*/
     private ICommand cmd;
 
+    private Set<Pair<Costume, String>> objectsHashSet;
+
     /**Данные, с которыми оперирует команда.*/
     private Stream data;
 
@@ -315,6 +318,14 @@ public enum Command {
 
     private void setData(Stream data) {
         this.data = data;
+    }
+
+    public Set<Pair<Costume, String>> getObjectsHashSet() {
+        return objectsHashSet;
+    }
+
+    public void setObjectsHashSet(Set<Pair<Costume, String>> objectsHashSet) {
+        this.objectsHashSet = objectsHashSet;
     }
 
     /**
