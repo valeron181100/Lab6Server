@@ -1,5 +1,6 @@
 package NetStuff;
 
+import Clothes.Costume;
 import FileSystem.CollectionManager;
 import FileSystem.Command;
 import FileSystem.EmptyFileException;
@@ -18,6 +19,7 @@ import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class ServerThreadHandler implements Runnable {
@@ -33,8 +35,11 @@ public class ServerThreadHandler implements Runnable {
 
     private SelectionKey key;
 
-    public ServerThreadHandler(SelectionKey key){
+    Set<Pair<Costume, String>> objectsHashSet;
+
+    public ServerThreadHandler(Set<Pair<Costume, String>> objectsHashSet,SelectionKey key){
         this.key = key;
+        this.objectsHashSet = objectsHashSet;
     }
 
     @Override

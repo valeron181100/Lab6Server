@@ -11,10 +11,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -276,17 +273,30 @@ public enum Command {
         String[] lpArgs = logPas.split("\\|");
         User user = new User(lpArgs[0], lpArgs[1]);
         user.setLoggedIn(true);
+        final boolean[] isAlreadyExistNickname = {false};
+        UsersVariables.users.forEach((k,v)->{
+           if (user.getLogin().equals(k.getLogin())){
+               isAlreadyExistNickname[0] = true;
+           }
+        });
         if (UsersVariables.users.containsKey(user)){
+            UsersVariables.onlineUsers.put(user, command.getAddress());
             command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
                     new byte[]{2})));
         }
         else {
-            UsersVariables.users.put(user, command.getAddress());
-            UsersVariables.onlineUsers.put(user, command.getAddress());
-            command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
-                    new byte[]{1})));
+            if(isAlreadyExistNickname[0]){
+                command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
+            }else {
+                UsersVariables.users.put(user, command.getAddress());
+                UsersVariables.onlineUsers.put(user, command.getAddress());
+                command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                        new byte[]{1})));
+            }
         }
         UsersVariables.saveUsers();
+        System.out.println(UsersVariables.users.size());
+        System.out.println("Online: " + UsersVariables.onlineUsers.size());
         UsersVariables.users.forEach((k,v)-> System.out.println(k.toString()));
     }));
 
@@ -337,7 +347,7 @@ public enum Command {
             String[] args = jsonInput.split(" ");
             Command command = Command.LOGIN;
             command.setData(Stream.of(
-                    args[1].substring(1, args[1].length() - 2) + "|" + args[2].substring(1, args[2].length() - 1)
+                    args[1].substring(1, args[1].length() - 1) + "|" + args[2].substring(1, args[2].length() - 1)
             ));
             return command;
         }else {

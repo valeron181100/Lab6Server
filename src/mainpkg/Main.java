@@ -6,11 +6,9 @@ import FileSystem.CollectionManager;
 import FileSystem.Command;
 import FileSystem.EmptyFileException;
 import FileSystem.UsersVariables;
-import NetStuff.Client;
-import NetStuff.ServerThreadHandler;
-import NetStuff.TransferCommandID;
-import NetStuff.TransferPackage;
+import NetStuff.*;
 import com.sun.org.apache.bcel.internal.generic.Select;
+import javafx.util.Pair;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,6 +22,8 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class Main {
@@ -35,6 +35,8 @@ public class Main {
     public static void main(String[] args) {
 
         //Runtime.getRuntime().addShutdownHook(new Thread(UsersVariables::saveUsers));
+
+        Set<Pair<Costume, String>> objectsHashSet = ConcurrentHashMap.newKeySet();
 
         try {
             UsersVariables.restoreUsers();
@@ -64,7 +66,7 @@ public class Main {
                 while (keyIterator.hasNext()){
                     SelectionKey key = keyIterator.next();
 
-                    ServerThreadHandler handler = new ServerThreadHandler(key);
+                    ServerThreadHandler handler = new ServerThreadHandler(objectsHashSet,key);
                     handler.run();
 
                     keyIterator.remove();
