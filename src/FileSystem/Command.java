@@ -272,7 +272,7 @@ public enum Command {
         System.out.println("Команда выполнена.");
     }),     ///Done
     LOGIN(((command, transferPackage) -> {
-        String logPas = new String(transferPackage.getAdditionalData(), Main.DEFAULT_CHAR_SET);
+        String logPas = (String)command.data.findFirst().get();
         String[] lpArgs = logPas.split("\\|");
         User user = new User(lpArgs[0], lpArgs[1]);
         user.setLoggedIn(true);
@@ -282,10 +282,11 @@ public enum Command {
         }
         else {
             UsersVariables.users.put(user, command.getAddress());
+            UsersVariables.onlineUsers.put(user, command.getAddress());
             command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
                     new byte[]{1})));
         }
-
+        UsersVariables.saveUsers();
         UsersVariables.users.forEach((k,v)-> System.out.println(k.toString()));
     }));
 
@@ -315,7 +316,8 @@ public enum Command {
 
         String jsonRegex = "{\"topClothes\":{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"T-Shirt\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"Trousers\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Panties\",\"is_for_man\":(true|false)},\"hat\":{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"BaseballHat\",\"is_for_man\":(true|false)},\"shoes\":{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Sneackers\",\"is_for_man\":(true|false)}}";
         String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.}";
-        String nodataCommandRegex = "show|load|info|start|exit|help|login";
+        String nodataCommandRegex = "show|load|info|start|exit|help";
+        String loginRegex = "login \\{.+} \\{.+}";
 
         if(jsonInput.matches(dataCommandRegex)){
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();
@@ -331,7 +333,14 @@ public enum Command {
         }else if(jsonInput.matches(nodataCommandRegex)){
             Command command = Command.valueOf(jsonInput.toUpperCase());
             return command;
-        }else{
+        }else if(jsonInput.matches(loginRegex)){
+            String[] args = jsonInput.split(" ");
+            Command command = Command.LOGIN;
+            command.setData(Stream.of(
+                    args[1].substring(1, args[1].length() - 2) + "|" + args[2].substring(1, args[2].length() - 1)
+            ));
+            return command;
+        }else {
             return null;
         }
  //        if(jsonInput.contains("{")){

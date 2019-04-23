@@ -3,11 +3,13 @@ package NetStuff;
 import FileSystem.CollectionManager;
 import FileSystem.Command;
 import FileSystem.EmptyFileException;
+import FileSystem.UsersVariables;
 import javafx.util.Pair;
 import mainpkg.Main;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -60,7 +62,19 @@ public class ServerThreadHandler implements Runnable {
                 key.interestOps(SelectionKey.OP_WRITE);
                 return;
             }
-            if (recieved.getAdditionalData() != null && recieved.getId() != 110)
+            if(recieved.getId() == 111){
+                try(ByteArrayInputStream bais = new ByteArrayInputStream(recieved.getAdditionalData());
+                    ObjectInputStream ois = new ObjectInputStream(bais)){
+                    User user = (User) ois.readObject();
+                    user.setLoggedIn(true);
+                    UsersVariables.onlineUsers.remove(user);
+                    System.out.println("Пользователь " + user.getLogin() + " был отключён!");
+                } catch (ClassNotFoundException e) {
+                    System.err.println("Ошибка при дессериализации пользователя");
+                }
+                return;
+            }
+            if (recieved.getAdditionalData() != null)
                 recieved.setData(CollectionManager.getCollectionFromXML(new String(recieved.getAdditionalData(), Main.DEFAULT_CHAR_SET)).stream());
             Command command = Command.parseCmd(recieved.getCmdData().trim());
             if(command == null)

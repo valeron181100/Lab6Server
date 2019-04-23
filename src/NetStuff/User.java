@@ -1,6 +1,8 @@
 package NetStuff;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String password;
     private String login;
     private boolean isLoggedIn;

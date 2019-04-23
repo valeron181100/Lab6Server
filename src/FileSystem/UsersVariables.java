@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class UsersVariables {
     public static Hashtable<User, SocketAddress> users = new Hashtable<>();
-
+    public static Hashtable<User,SocketAddress> onlineUsers = new Hashtable<>();
     public static void saveUsers(){
         try (FileOutputStream writer = new FileOutputStream("users.base");
              ObjectOutputStream oos = new ObjectOutputStream(writer)){
