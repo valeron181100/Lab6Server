@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.SocketAddress;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,8 +92,10 @@ public enum Command {
                     user[0] = k;
             });
         }
-
-        Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
+        ConcurrentHashMap<User, SocketAddress> onlineUsers = UsersVariables.onlineUsers;
+        ConcurrentHashMap<User, SocketAddress> users = UsersVariables.users;
+        int k = 0;
+        List<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin())).collect(Collectors.toList());
 
         final String[] output = {""};
 
@@ -240,16 +243,30 @@ public enum Command {
         System.out.println("Первый этап импорта пройден.");
     }),     ///Done
 
+    @SuppressWarnings("unchecked")
     I1A8S1D1F0G0H((command,transferPackage)->{
+        System.err.println("I am hereeee");
+        SocketAddress adress = command.getAddress();
+        final User[] user = new User[1];
+        UsersVariables.onlineUsers.forEach((k,v)->{
+            if(v.equals(adress))
+                user[0] = k;
+        });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
         try(ByteArrayInputStream bis = new ByteArrayInputStream(transferPackage.getAdditionalData());
-            DataInputStream dis = new DataInputStream(bis)){
-            HashSet<Costume> mainCollection = CollectionManager.getCollectionFromXML(dis.readUTF());
-
-            mainCollection.addAll(CollectionManager.getCollectionFromXML(dis.readUTF()));
-
+            ObjectInputStream dis = new ObjectInputStream(bis)){
+            HashSet<Costume> mainCollection = (HashSet<Costume>)dis.readObject();
+            HashSet<Pair<Costume,String>> collection = new HashSet<>();
+            mainCollection.forEach(p -> collection.add(new Pair<>(p, user[0].getLogin())));
+            command.getObjectsHashSet().addAll(collection);
             command.setData(Stream.of(new TransferPackage(601, "Команда выполнена.", null)));
 
-        } catch (IOException | EmptyFileException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println(e.getMessage());
         }
     }),     ///Done
@@ -531,18 +548,22 @@ public enum Command {
      */
     public static Command parseCmd(String jsonInput) throws IllegalArgumentException{
 
-        String jsonRegex = "{\"topClothes\":{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"T-Shirt\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"Trousers\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Panties\",\"is_for_man\":(true|false)},\"hat\":{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"BaseballHat\",\"is_for_man\":(true|false)},\"shoes\":{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Sneackers\",\"is_for_man\":(true|false)}}";
-        String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.}";
-        String nodataCommandRegex = "show|load|info|start|exit|help|save";
+        String jsonRegex = "\\{\"topClothes\":\\{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"(.+)\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":\\{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"(.+)\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":\\{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"(.+)\",\"is_for_man\":(true|false)},\"hat\":\\{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"(.+)\",\"is_for_man\":(true|false)},\"shoes\":\\{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"(.+)\",\"is_for_man\":(true|false)}}";
+        String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.+}";
+        String nodataCommandRegex = "show|load|info|start|exit|help|save|I1A8S1D1F0G0H";
         String loginRegex = "login \\{.+} \\{.+}";
 
         if(jsonInput.matches(dataCommandRegex)){
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();
             String data;
             if(cmd.equals("IMPORT")){
-                data = jsonInput.split(" ")[1].substring(1, jsonInput.split(" ")[1].length() - 2);
+                data = jsonInput.split(" ")[1].substring(1, jsonInput.split(" ")[1].length() - 1);
             } else{
-                data = findMatches(jsonRegex, jsonInput).get(0);
+                ArrayList<String> list = findMatches(jsonRegex, jsonInput);
+                if (list.size() != 0)
+                    data = list.get(0);
+                else
+                    return null;
             }
             Command command = Command.valueOf(cmd);
             command.setData(Stream.of(data));

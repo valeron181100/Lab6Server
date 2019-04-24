@@ -4,9 +4,6 @@ import NetStuff.User;
 
 import java.io.*;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UsersVariables {

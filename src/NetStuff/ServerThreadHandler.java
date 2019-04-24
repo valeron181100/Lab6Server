@@ -32,7 +32,7 @@ public class ServerThreadHandler implements Runnable {
 
     private SocketAddress templeAdress = null;
 
-    private Command previousCmd = null;
+    private static Command previousCmd = null;
 
     private SelectionKey key;
 
@@ -80,7 +80,7 @@ public class ServerThreadHandler implements Runnable {
                 }
                 return;
             }
-            if (recieved.getAdditionalData() != null)
+            if (recieved.getAdditionalData() != null && recieved.getCmdData().equals("load"))
                 recieved.setData(CollectionManager.getCollectionFromXML(new String(recieved.getAdditionalData(), Main.DEFAULT_CHAR_SET)).stream());
             final User[] user = new User[1];
             UsersVariables.onlineUsers.forEach((k,v)->{
@@ -97,9 +97,12 @@ public class ServerThreadHandler implements Runnable {
             }
 
             Command command = Command.parseCmd(recieved.getCmdData().trim());
+            if(previousCmd!=null)
+            System.out.println("Previous CMD : " + previousCmd.toString());
             if(command == null)
                 client.setaPackage(new TransferPackage(-1, "Неверная команда!", null));
             else {
+                System.out.println("Current CMD : " + command.toString());
                 if (command == Command.I1A8S1D1F0G0H && previousCmd != Command.IMPORT){
                     client.setaPackage(new TransferPackage(-1, "Неверная команда!", null));
                 }
@@ -133,6 +136,11 @@ public class ServerThreadHandler implements Runnable {
             } catch (UnsupportedEncodingException e1) {
                 System.err.println(e1.getMessage());
             }
+        }
+        catch (NullPointerException e){
+            client.setaPackage(new TransferPackage(-1, "Команда не выполнена. Войдите на сервер еще раз с помощью комманды login", null));
+            key.interestOps(SelectionKey.OP_WRITE);
+            return;
         }
     }
 
