@@ -365,6 +365,8 @@ public enum Command {
                 "change_def_file_path {String path}: меняет путь к файлу с коллекцией на новый.\n" +
                 "trimToMin: обрезает коллекцию до минимума.\n" +
                 "help: справка \n" +
+                "login {loginStr} {passwordStr}: залогиннится на сервере.(Пароль должен быть не менее 8 символов) \n" +
+                "save: сохранить коллекцию с сервера\n" +
                 "Пример правильного формата ввода объекта json: \n" +
                 "{\"topClothes\":{\"growth_sm\":170,\"size\":50,\"color\":\"White\",\"material\":\"Chlopoc\",\"is_hood\":false,\"name\":\"T-Shirt\",\"is_for_man\":true,\"hand_sm_length\":60},\"downClothes\":{\"size\":50,\"color\":\"Black\",\"material\":\"Chlopoc\",\"diametr_leg_sm\":40,\"name\":\"Trousers\",\"leg_length_sm\":70,\"is_for_man\":true},\"underwear\":{\"sex_lvl\":100,\"size\":50,\"color\":\"Red\",\"material\":\"Chlopoc\",\"name\":\"Panties\",\"is_for_man\":true},\"hat\":{\"cylinder_height_sm\":15,\"size\":50,\"color\":\"White\",\"material\":\"Len\",\"visor_length_sm\":20,\"name\":\"BaseballHat\",\"is_for_man\":true},\"shoes\":{\"is_shoelaces\":true,\"size\":38,\"color\":\"White\",\"material\":\"Leather\",\"outsole_material\":\"Rubber\",\"name\":\"Sneackers\",\"is_for_man\":true}}"
         ).getBytes())));
