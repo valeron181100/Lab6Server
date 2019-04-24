@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ServerThreadHandler implements Runnable {
@@ -35,11 +36,8 @@ public class ServerThreadHandler implements Runnable {
 
     private SelectionKey key;
 
-    Set<Pair<Costume, String>> objectsHashSet;
-
-    public ServerThreadHandler(Set<Pair<Costume, String>> objectsHashSet,SelectionKey key){
+    public ServerThreadHandler(SelectionKey key){
         this.key = key;
-        this.objectsHashSet = objectsHashSet;
     }
 
     @Override
@@ -73,6 +71,9 @@ public class ServerThreadHandler implements Runnable {
                     User user = (User) ois.readObject();
                     user.setLoggedIn(true);
                     UsersVariables.onlineUsers.remove(user);
+                    List<Pair<Costume, String>> colRmItems = Main.objectsHashSet.stream().filter(p -> !p.getValue().equals(user.getLogin())).collect(Collectors.toList());
+                    Main.objectsHashSet.clear();
+                    Main.objectsHashSet.addAll(colRmItems);
                     System.out.println("Пользователь " + user.getLogin() + " был отключён!");
                 } catch (ClassNotFoundException e) {
                     System.err.println("Ошибка при дессериализации пользователя");
@@ -90,8 +91,8 @@ public class ServerThreadHandler implements Runnable {
                 }
                 else {
                     command.setAddress(adress);
-                    command.setObjectsHashSet(objectsHashSet);
                     client.setaPackage(command.start(command, recieved));
+                    System.out.println("Collection size: " + Main.objectsHashSet.size());
                 }
             }
 

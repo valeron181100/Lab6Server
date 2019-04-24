@@ -32,11 +32,11 @@ public class Main {
 
     public static final String DEFAULT_CHAR_SET = "UTF-8";
 
+    public static Set<Pair<Costume, String>> objectsHashSet = ConcurrentHashMap.newKeySet();
+
     public static void main(String[] args) {
 
         //Runtime.getRuntime().addShutdownHook(new Thread(UsersVariables::saveUsers));
-
-        Set<Pair<Costume, String>> objectsHashSet = ConcurrentHashMap.newKeySet();
 
         try {
             UsersVariables.restoreUsers();
@@ -66,7 +66,7 @@ public class Main {
                 while (keyIterator.hasNext()){
                     SelectionKey key = keyIterator.next();
 
-                    ServerThreadHandler handler = new ServerThreadHandler(objectsHashSet,key);
+                    ServerThreadHandler handler = new ServerThreadHandler(key);
                     handler.run();
 
                     keyIterator.remove();
