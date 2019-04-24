@@ -7,10 +7,11 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UsersVariables {
-    public static Hashtable<User, SocketAddress> users = new Hashtable<>();
-    public static Hashtable<User,SocketAddress> onlineUsers = new Hashtable<>();
+    public static ConcurrentHashMap<User, SocketAddress> users = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<User,SocketAddress> onlineUsers = new ConcurrentHashMap<>();
     public static void saveUsers(){
         try (FileOutputStream writer = new FileOutputStream("users.base");
              ObjectOutputStream oos = new ObjectOutputStream(writer)){
@@ -25,7 +26,7 @@ public class UsersVariables {
         try (FileInputStream reader = new FileInputStream("users.base");
              ObjectInputStream ois = new ObjectInputStream(reader)){
 
-            users = (Hashtable<User, SocketAddress>) ois.readObject();
+            users = (ConcurrentHashMap<User, SocketAddress>) ois.readObject();
         } catch (FileNotFoundException e) {
             System.err.println("Файл с пользователями не найден!");
         } catch (IOException | ClassNotFoundException e) {

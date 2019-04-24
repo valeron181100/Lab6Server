@@ -71,9 +71,9 @@ public class ServerThreadHandler implements Runnable {
                     User user = (User) ois.readObject();
                     user.setLoggedIn(true);
                     UsersVariables.onlineUsers.remove(user);
-                    List<Pair<Costume, String>> colRmItems = Main.objectsHashSet.stream().filter(p -> !p.getValue().equals(user.getLogin())).collect(Collectors.toList());
-                    Main.objectsHashSet.clear();
-                    Main.objectsHashSet.addAll(colRmItems);
+                    List<Pair<Costume, String>> colRmItems = Main.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user.getLogin())).collect(Collectors.toList());
+                    Main.getObjectsHashSet().clear();
+                    Main.getObjectsHashSet().addAll(colRmItems);
                     System.out.println("Пользователь " + user.getLogin() + " был отключён!");
                 } catch (ClassNotFoundException e) {
                     System.err.println("Ошибка при дессериализации пользователя");
@@ -82,6 +82,20 @@ public class ServerThreadHandler implements Runnable {
             }
             if (recieved.getAdditionalData() != null)
                 recieved.setData(CollectionManager.getCollectionFromXML(new String(recieved.getAdditionalData(), Main.DEFAULT_CHAR_SET)).stream());
+            final User[] user = new User[1];
+            UsersVariables.onlineUsers.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+            if(user[0] != null && !recieved.getCmdData().equals("load")){
+                Stream<Pair<Costume, String>> userStream = Main.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
+                if(userStream.count() == 0){
+                    client.setaPackage(new TransferPackage(-1, "Прежде чем работать с вашей коллекцией, загрузите её с помощью комманды 'load' ", null));
+                    key.interestOps(SelectionKey.OP_WRITE);
+                    return;
+                }
+            }
+
             Command command = Command.parseCmd(recieved.getCmdData().trim());
             if(command == null)
                 client.setaPackage(new TransferPackage(-1, "Неверная команда!", null));
@@ -92,7 +106,7 @@ public class ServerThreadHandler implements Runnable {
                 else {
                     command.setAddress(adress);
                     client.setaPackage(command.start(command, recieved));
-                    System.out.println("Collection size: " + Main.objectsHashSet.size());
+                    System.out.println("Collection size: " + Main.getObjectsHashSet().size());
                 }
             }
 

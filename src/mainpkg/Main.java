@@ -9,22 +9,25 @@ import FileSystem.UsersVariables;
 import NetStuff.*;
 import com.sun.org.apache.bcel.internal.generic.Select;
 import javafx.util.Pair;
+import org.json.JSONArray;
+import org.json.XML;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import javax.swing.*;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
 import java.net.*;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -34,9 +37,52 @@ public class Main {
 
     public static Set<Pair<Costume, String>> objectsHashSet = ConcurrentHashMap.newKeySet();
 
-    public static void main(String[] args) {
+    public static boolean writeCollection(Set<Pair<Costume, String>> collection){
+        try (FileOutputStream writer = new FileOutputStream("collection.xml");
+             ObjectOutputStream oos = new ObjectOutputStream(writer)){
+            oos.writeObject(collection);
+        } catch (IOException e) {
+            System.err.println("Что-то пошло не так при сохраненнии коллекции!");
+            return false;
+        }
+        System.out.println("Writing was ended!");
+        return true;
+    }
 
-        //Runtime.getRuntime().addShutdownHook(new Thread(UsersVariables::saveUsers));
+    public static Set<Pair<Costume, String>> getCollectionFromFile(){
+        try (FileInputStream reader = new FileInputStream("collection.xml");
+             ObjectInputStream ois = new ObjectInputStream(reader)){
+
+            return (Set<Pair<Costume, String>>) ois.readObject();
+        } catch (FileNotFoundException e) {
+            System.err.println("Файл с пользователями не найден!");
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Что-то пошло не так при восстановлении пользователей!");
+        }
+        return null;
+    }
+
+    public static Set<Pair<Costume, String>> getObjectsHashSet(){
+        return objectsHashSet;
+    }
+
+    public static void main(String[] args) {
+        Set<Pair<Costume, String>> collectionFromFile = getCollectionFromFile();
+        if(collectionFromFile != null)
+            objectsHashSet.addAll(collectionFromFile);
+
+        new Timer(10000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                HashSet<Pair<Costume, String>> pairs = new HashSet<>();
+                     for (Map.Entry<User,SocketAddress> entry: UsersVariables.onlineUsers.entrySet()){
+                         Set<Pair<Costume, String>> pairSet = objectsHashSet.stream().filter(p -> p.getValue().equals(entry.getKey().getLogin())).collect(Collectors.toSet());
+                         pairs.addAll(pairSet);
+                     }
+                     objectsHashSet.clear();
+                     objectsHashSet.addAll(pairs);
+            }
+        }).start();
 
         try {
             UsersVariables.restoreUsers();

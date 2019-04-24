@@ -44,6 +44,12 @@ public enum Command {
                 if(v.equals(adress))
                     user[0] = k;
             });
+            if(user[0] == null){
+                UsersVariables.users.forEach((k,v)->{
+                    if(v.equals(adress))
+                        user[0] = k;
+                });
+            }
             Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()) && !p.getKey().equals(costume));
             Stream<Pair<Costume, String>> otherStream = command.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user[0].getLogin()));
             HashSet<Pair<Costume, String>> userCostumes = new HashSet<>();
@@ -54,12 +60,11 @@ public enum Command {
             command.getObjectsHashSet().clear();
             command.getObjectsHashSet().addAll(userCostumes);
 
+            Main.writeCollection(Main.getObjectsHashSet());
 
             HashSet<Costume> costumes = new HashSet<>();
             userCostumes.forEach(p-> costumes.add(p.getKey()));
-            command.setData(Stream.of(new TransferPackage(1, "Команда выполнена.", null,
-                    CollectionManager.getXmlFromCollection(costumes).getBytes(Main.DEFAULT_CHAR_SET))));
-
+            command.setData(Stream.of(new TransferPackage(1, "Команда выполнена.", null)));
             System.out.println("Команда выполнена.");
         }
         catch (JSONException e){
@@ -80,9 +85,14 @@ public enum Command {
             if(v.equals(adress))
                 user[0] = k;
         });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
 
         Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
-
 
         final String[] output = {""};
 
@@ -115,6 +125,12 @@ public enum Command {
                 if(v.equals(adress))
                     user[0] = k;
             });
+            if(user[0] == null){
+                UsersVariables.users.forEach((k,v)->{
+                    if(v.equals(adress))
+                        user[0] = k;
+                });
+            }
             Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
             Pair<Costume, String> maxCostume = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin())).max(Comparator.comparing(p->p.getKey().hashCode())).get();
             Stream<Pair<Costume, String>> otherStream= command.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user[0].getLogin()));
@@ -136,12 +152,9 @@ public enum Command {
             command.getObjectsHashSet().clear();
             command.getObjectsHashSet().addAll(userCostumes);
 
-            //Fill collection
-            HashSet<Costume> costumes = new HashSet<>();
-            stream.forEach(p-> costumes.add(p.getKey()));
+            Main.writeCollection(Main.getObjectsHashSet());
 
-            command.setData(Stream.of(new TransferPackage(3, "Команда выполнена.", null,
-                    CollectionManager.getXmlFromCollection(costumes).getBytes(Main.DEFAULT_CHAR_SET))));
+            command.setData(Stream.of(new TransferPackage(3, "Команда выполнена.", null)));
             // Now data has Transfer Package for sending
             System.out.println("Команда выполнена.");
         }
@@ -157,9 +170,16 @@ public enum Command {
             if(v.equals(adress))
                 user[0] = k;
         });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
         Stream<Pair<Costume, String>> concatStream = Stream.concat(command.getObjectsHashSet().stream(), transferPackage.getData().map(p -> new Pair<>(p, user[0].getLogin())));
         command.getObjectsHashSet().addAll(concatStream.collect(Collectors.toList()));
         command.setData(Stream.of(new TransferPackage(4, "Команда выполнена.", null, "Load collection to server".getBytes(Main.DEFAULT_CHAR_SET))));
+        Main.writeCollection(Main.getObjectsHashSet());
         System.out.println("Команда выполнена.");
     }),
     INFO((command,transferPackage)->{
@@ -172,6 +192,12 @@ public enum Command {
             if(v.equals(adress))
                 user[0] = k;
         });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
 
         Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
 
@@ -221,8 +247,7 @@ public enum Command {
 
             mainCollection.addAll(CollectionManager.getCollectionFromXML(dis.readUTF()));
 
-            command.setData(Stream.of(new TransferPackage(601, "Команда выполнена.", null,
-                    CollectionManager.getXmlFromCollection(mainCollection).getBytes(Main.DEFAULT_CHAR_SET))));
+            command.setData(Stream.of(new TransferPackage(601, "Команда выполнена.", null)));
 
         } catch (IOException | EmptyFileException e) {
             System.err.println(e.getMessage());
@@ -249,6 +274,12 @@ public enum Command {
                 if(v.equals(adress))
                     user[0] = k;
             });
+            if(user[0] == null){
+                UsersVariables.users.forEach((k,v)->{
+                    if(v.equals(adress))
+                        user[0] = k;
+                });
+            }
             Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
             Stream<Pair<Costume, String>> otherStream= command.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user[0].getLogin()));
             Stream<Pair<Costume, String>> stream = Stream.concat(userStream, Stream.of(new Pair<Costume, String>(costume, user[0].getLogin())));
@@ -261,13 +292,9 @@ public enum Command {
             command.getObjectsHashSet().clear();
             command.getObjectsHashSet().addAll(userCostumes);
 
-            //Fill collection
-            HashSet<Costume> costumes = new HashSet<>();
-            stream.forEach(p-> costumes.add(p.getKey()));
+            Main.writeCollection(Main.getObjectsHashSet());
 
-            String xml = CollectionManager.getXmlFromCollection(costumes);
-
-            command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null, xml.getBytes(Main.DEFAULT_CHAR_SET))));
+            command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
             System.out.println("Команда выполнена.");
         }
         catch (JSONException e){
@@ -283,6 +310,12 @@ public enum Command {
             if(v.equals(adress))
                 user[0] = k;
         });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
 
         HashSet<Costume> collection = new HashSet<>();
 
@@ -343,6 +376,12 @@ public enum Command {
             if(v.equals(adress))
                 user[0] = k;
         });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
 
 
         Stream<Pair<Costume, String>> limitStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin())).limit(5);
@@ -357,8 +396,9 @@ public enum Command {
         command.getObjectsHashSet().clear();
         command.getObjectsHashSet().addAll(set);
 
-        command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null,
-                CollectionManager.getXmlFromCollection(collection).getBytes(Main.DEFAULT_CHAR_SET))));
+        Main.writeCollection(Main.getObjectsHashSet());
+
+        command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
         System.out.println("Команда выполнена.");
     }),     ///Done
     LOGIN(((command, transferPackage) -> {
@@ -367,30 +407,99 @@ public enum Command {
         User user = new User(lpArgs[0], lpArgs[1]);
         user.setLoggedIn(true);
         final boolean[] isAlreadyExistNickname = {false};
+
+        final boolean[] isUserOnline = {false};
+        UsersVariables.onlineUsers.forEach((k,v)->{
+            if (command.getAddress().equals(v)){
+                isUserOnline[0] = true;
+            }
+        });
+
         UsersVariables.users.forEach((k,v)->{
            if (user.getLogin().equals(k.getLogin())){
                isAlreadyExistNickname[0] = true;
            }
         });
-        if (UsersVariables.users.containsKey(user)){
-            UsersVariables.onlineUsers.put(user, command.getAddress());
-            command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
-                    new byte[]{2})));
-        }
-        else {
-            if(isAlreadyExistNickname[0]){
-                command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
-            }else {
-                UsersVariables.users.put(user, command.getAddress());
+        if(!isUserOnline[0]) {
+            if (UsersVariables.users.containsKey(user)) {
                 UsersVariables.onlineUsers.put(user, command.getAddress());
                 command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
-                        new byte[]{1})));
+                        new byte[]{2})));
+            } else {
+                if (isAlreadyExistNickname[0]) {
+                    command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
+                } else {
+                    UsersVariables.users.put(user, command.getAddress());
+                    UsersVariables.onlineUsers.put(user, command.getAddress());
+                    command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                            new byte[]{1})));
+                }
+            }
+        }
+        else{
+            boolean isCurrentUserOnline = false;
+
+            for(Map.Entry<User, SocketAddress> entry : UsersVariables.onlineUsers.entrySet()){
+                User k = entry.getKey();
+                SocketAddress v = entry.getValue();
+                if(command.getAddress().equals(v)){
+                    if (user.getLogin().equals(k.getLogin())){
+                        command.setData(Stream.of(new TransferPackage(-1, "Вы уже авторизированы!", null)));
+                        break;
+                    }else {
+                        UsersVariables.onlineUsers.remove(k);
+                        UsersVariables.onlineUsers.put(user, command.getAddress());
+                        List<Pair<Costume, String>> colRmItems = Main.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(k.getLogin())).collect(Collectors.toList());
+                        Main.getObjectsHashSet().clear();
+                        Main.getObjectsHashSet().addAll(colRmItems);
+                        System.out.println("Пользователь " + user.getLogin() + " был отключён!");
+                        if (UsersVariables.users.containsKey(user)) {
+                            UsersVariables.onlineUsers.put(user, command.getAddress());
+                            command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                                    new byte[]{2})));
+                            break;
+                        } else {
+                            if (isAlreadyExistNickname[0]) {
+                                command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
+                                break;
+                            } else {
+                                UsersVariables.users.put(user, command.getAddress());
+                                UsersVariables.onlineUsers.put(user, command.getAddress());
+                                command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                                        new byte[]{1})));
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
         UsersVariables.saveUsers();
         System.out.println(UsersVariables.users.size());
         System.out.println("Online: " + UsersVariables.onlineUsers.size());
         UsersVariables.users.forEach((k,v)-> System.out.println(k.toString()));
+    })),
+    SAVE(((command, transferPackage) -> {
+        HashSet<Costume> collection = new HashSet<>();
+
+        SocketAddress adress = command.getAddress();
+        final User[] user = new User[1];
+        UsersVariables.onlineUsers.forEach((k,v)->{
+            if(v.equals(adress))
+                user[0] = k;
+        });
+        if(user[0] == null){
+            UsersVariables.users.forEach((k,v)->{
+                if(v.equals(adress))
+                    user[0] = k;
+            });
+        }
+
+        Stream<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin()));
+        userStream.map(Pair::getKey).collect(Collectors.toCollection(()->collection));
+
+        command.setData(Stream.of(new TransferPackage(12, "Команда выполнена.", null,
+                CollectionManager.getBytesFromCollection(collection))));
     }));
 
     Command(ICommand cmd){
@@ -411,7 +520,7 @@ public enum Command {
     }
 
     public Set<Pair<Costume, String>> getObjectsHashSet() {
-        return Main.objectsHashSet;
+        return Main.getObjectsHashSet();
     }
 
 
@@ -424,7 +533,7 @@ public enum Command {
 
         String jsonRegex = "{\"topClothes\":{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"T-Shirt\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"Trousers\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Panties\",\"is_for_man\":(true|false)},\"hat\":{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"BaseballHat\",\"is_for_man\":(true|false)},\"shoes\":{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"Sneackers\",\"is_for_man\":(true|false)}}";
         String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.}";
-        String nodataCommandRegex = "show|load|info|start|exit|help";
+        String nodataCommandRegex = "show|load|info|start|exit|help|save";
         String loginRegex = "login \\{.+} \\{.+}";
 
         if(jsonInput.matches(dataCommandRegex)){

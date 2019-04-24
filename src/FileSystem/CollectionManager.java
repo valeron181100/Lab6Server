@@ -37,6 +37,29 @@ public class CollectionManager {
             return costumes;
     }
 
+
+    public static byte[] getBytesFromCollection(HashSet<Costume> costumes){
+        try(ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos)){
+            oos.writeObject(costumes);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            System.err.println("Ошибка: не удалось сериализовать коллекцию");
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashSet<Costume> getCollectionFromBytes(byte[] bytes){
+        try(ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(bais)){
+            return (HashSet<Costume>)ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Ошибка: не удалось сериализовать коллекцию");
+        }
+        return null;
+    }
+
     /**
      * Получает XML строку из коллекции.
      * @author Валерий Бондарь
