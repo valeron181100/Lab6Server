@@ -4,14 +4,9 @@ import Clothes.Costume;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
-import sun.invoke.empty.Empty;
 
-import javax.xml.stream.XMLEventWriter;
 import java.io.*;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Scanner;
 
 /**
  * Класс-менеджер коллекции.

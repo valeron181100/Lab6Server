@@ -1,7 +1,6 @@
 package NetStuff;
 
 import java.io.Serializable;
-import java.net.SocketAddress;
 
 public class User implements Serializable {
     private String password;

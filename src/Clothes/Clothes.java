@@ -1,6 +1,7 @@
 package Clothes;
 
-import Enums.*;
+import Enums.Color;
+import Enums.Material;
 
 import java.io.Serializable;
 

@@ -1,33 +1,26 @@
 package mainpkg;
 
 import Clothes.Costume;
-import Clothes.TopClothes;
-import FileSystem.CollectionManager;
-import FileSystem.Command;
-import FileSystem.EmptyFileException;
 import FileSystem.UsersVariables;
-import NetStuff.*;
-import com.sun.org.apache.bcel.internal.generic.Select;
-import javafx.util.Pair;
-import org.json.JSONArray;
-import org.json.XML;
+import NetStuff.Client;
+import NetStuff.ServerThreadHandler;
+import NetStuff.User;
 
-import javax.swing.*;
-import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.*;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
+import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -71,18 +64,15 @@ public class Main {
         if(collectionFromFile != null)
             objectsHashSet.addAll(collectionFromFile);
 
-        new Timer(10000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                HashSet<Pair<Costume, String>> pairs = new HashSet<>();
-                     for (Map.Entry<User,SocketAddress> entry: UsersVariables.onlineUsers.entrySet()){
-                         Set<Pair<Costume, String>> pairSet = objectsHashSet.stream().filter(p -> p.getValue().equals(entry.getKey().getLogin())).collect(Collectors.toSet());
-                         pairs.addAll(pairSet);
-                     }
-                     objectsHashSet.clear();
-                     objectsHashSet.addAll(pairs);
+        Executors.newScheduledThreadPool(1).schedule(() -> {
+            HashSet<Pair<Costume, String>> pairs = new HashSet<>();
+            for (Map.Entry<User, SocketAddress> entry : UsersVariables.onlineUsers.entrySet()) {
+                Set<Pair<Costume, String>> pairSet = objectsHashSet.stream().filter(p -> p.getValue().equals(entry.getKey().getLogin())).collect(Collectors.toSet());
+                pairs.addAll(pairSet);
             }
-        }).start();
+            objectsHashSet.clear();
+            objectsHashSet.addAll(pairs);
+        }, 10, TimeUnit.SECONDS);
 
         try {
             UsersVariables.restoreUsers();

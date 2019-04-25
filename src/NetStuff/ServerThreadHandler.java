@@ -5,7 +5,7 @@ import FileSystem.CollectionManager;
 import FileSystem.Command;
 import FileSystem.EmptyFileException;
 import FileSystem.UsersVariables;
-import javafx.util.Pair;
+import mainpkg.Pair;
 import mainpkg.Main;
 
 import java.io.ByteArrayInputStream;
@@ -16,10 +16,7 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
