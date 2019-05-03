@@ -17,6 +17,8 @@ public class TransferPackage implements Serializable {
 
     private byte[] additionalData;
 
+    private User user;
+
     public TransferPackage(){
         this.id = 666;
     }
@@ -36,6 +38,14 @@ public class TransferPackage implements Serializable {
         this.cmdData = cmdData;
         this.data = data;
         this.additionalData = additionalData;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public byte[] getAdditionalData() {

@@ -67,8 +67,8 @@ public class User implements Serializable {
         int prime = 5;
         int result = 1;
         int isLogged = isLoggedIn ? 1 : 0;
-        result = (int)(result * Math.pow(prime,1) + login.length() * Math.pow(prime,2) +
-                password.length() * Math.pow(prime,3) + isLogged * Math.pow(prime,4));
+        result = (int)(result * Math.pow(prime,1) + login.hashCode() * Math.pow(prime,2) +
+                password.hashCode() * Math.pow(prime,3));
         return result;
     }
 }
