@@ -378,7 +378,7 @@ public enum Command {
         command.setData(Stream.of(new TransferPackage(10, "Команда выполнена.", null, strData.getBytes(Main.DEFAULT_CHAR_SET))));
     })),
     TRIMTOMIN((command,transferPackage) -> {
-        HashSet<Costume> collection = new HashSet<>();
+        HashSet<Pair<Costume, String>> collection = new HashSet<>();
 
         SocketAddress adress = command.getAddress();
         final User[] user = new User[1];
@@ -396,15 +396,14 @@ public enum Command {
 
         Stream<Pair<Costume, String>> limitStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user[0].getLogin())).limit(5);
 
-        limitStream.sequential().map(Pair::getKey).collect(Collectors.toCollection(() -> collection));
+        limitStream.sequential().collect(Collectors.toCollection(() -> collection));
 
-        Stream<Costume> costumeStream = Stream.concat(command.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user[0].getLogin())).map(Pair::getKey), limitStream.map(Pair::getKey));
-
-        HashSet<Pair<Costume, String>> set = new HashSet<>();
-        Stream.concat(command.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user[0].getLogin())), limitStream).collect(Collectors.toCollection(()->set));
+        HashSet<Pair<Costume, String>> others = new HashSet<>();
+        command.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(user[0].getLogin())).collect(Collectors.toCollection(()->others));
 
         command.getObjectsHashSet().clear();
-        command.getObjectsHashSet().addAll(set);
+        command.getObjectsHashSet().addAll(collection);
+        command.getObjectsHashSet().addAll(others);
 
         Main.writeCollection(Main.getObjectsHashSet());
 

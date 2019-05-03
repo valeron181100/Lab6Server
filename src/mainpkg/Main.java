@@ -42,15 +42,16 @@ public class Main {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     public static Set<Pair<Costume, String>> getCollectionFromFile(){
         try (FileInputStream reader = new FileInputStream("collection.xml");
              ObjectInputStream ois = new ObjectInputStream(reader)){
 
             return (Set<Pair<Costume, String>>) ois.readObject();
         } catch (FileNotFoundException e) {
-            System.err.println("Файл с пользователями не найден!");
+            System.err.println("Файл с коллекцией не найден!");
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Что-то пошло не так при восстановлении пользователей!");
+            System.err.println("Что-то пошло не так при восстановлении коллекции!");
         }
         return null;
     }

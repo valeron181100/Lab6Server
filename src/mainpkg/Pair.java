@@ -1,6 +1,8 @@
 package mainpkg;
 
-public class Pair<K,V> {
+import java.io.Serializable;
+
+public class Pair<K,V> implements Serializable {
     private K key;
     private V value;
     public Pair(K key, V value){
