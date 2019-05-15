@@ -69,8 +69,7 @@ public enum Command {
         ConcurrentHashMap<User, SocketAddress> onlineUsers = UsersVariables.onlineUsers;
         ConcurrentHashMap<User, SocketAddress> users = UsersVariables.users;
 
-        List<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user.getLogin())).collect(Collectors.toList());
-
+        Set<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user.getLogin())).collect(Collectors.toSet());
         final String[] output = {""};
 
         userStream.forEach(p -> output[0] += p.getKey().toString() + "\t");
@@ -133,7 +132,8 @@ public enum Command {
     LOAD((command,transferPackage)->{
         User user = transferPackage.getUser();
         Stream<Pair<Costume, String>> concatStream = Stream.concat(command.getObjectsHashSet().stream(), transferPackage.getData().map(p -> new Pair<>(p, user.getLogin())));
-        command.getObjectsHashSet().addAll(concatStream.collect(Collectors.toList()));
+        HashSet<Pair<Costume, String>> set = new HashSet<>(concatStream.collect(Collectors.toSet()));
+        command.getObjectsHashSet().addAll(set);
         command.setData(Stream.of(new TransferPackage(4, "Команда выполнена.", null, "Load collection to server".getBytes(Main.DEFAULT_CHAR_SET))));
         Main.writeCollection(Main.getObjectsHashSet());
         System.out.println("Команда выполнена.");
@@ -365,7 +365,7 @@ public enum Command {
                         List<Pair<Costume, String>> colRmItems = Main.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(k.getLogin())).collect(Collectors.toList());
                         Main.getObjectsHashSet().clear();
                         Main.getObjectsHashSet().addAll(colRmItems);
-                        System.out.println("Пользователь " + user.getLogin() + " был отключён!");
+                        System.out.println("Пользователь " + k.getLogin() + " был отключён!");
                         if (UsersVariables.users.containsKey(user)) {
                             UsersVariables.onlineUsers.put(user, command.getAddress());
                             command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
@@ -389,7 +389,7 @@ public enum Command {
         UsersVariables.saveUsers();
         System.out.println(UsersVariables.users.size());
         System.out.println("Online: " + UsersVariables.onlineUsers.size());
-        UsersVariables.users.forEach((k,v)-> System.out.println(k.toString()));
+        UsersVariables.onlineUsers.forEach((k,v)-> System.out.println(k.toString()));
     })),
     SAVE(((command, transferPackage) -> {
         HashSet<Costume> collection = new HashSet<>();
@@ -440,7 +440,7 @@ public enum Command {
         if(jsonInput.matches(dataCommandRegex)){
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();
             String data;
-            if(cmd.equals("IMPORT")){
+            if(cmd.equals("IMPORT") || cmd.equals("CHANGE_DEF_FILE_PATH")){
                 data = jsonInput.split(" ")[1].substring(1, jsonInput.split(" ")[1].length() - 1);
             } else{
                 ArrayList<String> list = findMatches(jsonRegex, jsonInput);

@@ -25,4 +25,25 @@ public class Pair<K,V> implements Serializable {
     public void setKey(K key) {
         this.key = key;
     }
+
+    @Override
+    public int hashCode() {
+        return key.hashCode() + value.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Pair<K,V> other = (Pair<K,V>) obj;
+        if (!this.key.equals(other.key))
+            return false;
+        if (!this.value.equals(other.value))
+            return false;
+        return true;
+    }
 }
