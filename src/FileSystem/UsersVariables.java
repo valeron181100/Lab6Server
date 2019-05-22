@@ -1,6 +1,6 @@
 package FileSystem;
 
-import NetStuff.User;
+import NetStuff.Server.User;
 
 import java.io.*;
 import java.net.SocketAddress;

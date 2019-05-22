@@ -1,4 +1,4 @@
-package NetStuff;
+package NetStuff.Server;
 
 import Clothes.Costume;
 import FileSystem.CollectionManager;

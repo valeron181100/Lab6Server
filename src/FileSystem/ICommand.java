@@ -1,6 +1,6 @@
 package FileSystem;
 
-import NetStuff.TransferPackage;
+import NetStuff.Server.TransferPackage;
 
 import java.io.UnsupportedEncodingException;
 

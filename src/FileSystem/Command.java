@@ -1,8 +1,8 @@
 package FileSystem;
 
 import Clothes.Costume;
-import NetStuff.TransferPackage;
-import NetStuff.User;
+import NetStuff.Server.TransferPackage;
+import NetStuff.Server.User;
 import mainpkg.*;
 import org.json.JSONException;
 import org.json.JSONObject;

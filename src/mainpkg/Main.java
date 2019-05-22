@@ -2,9 +2,9 @@ package mainpkg;
 
 import Clothes.Costume;
 import FileSystem.UsersVariables;
-import NetStuff.Client;
-import NetStuff.ServerThreadHandler;
-import NetStuff.User;
+import NetStuff.Server.Client;
+import NetStuff.Server.ServerThreadHandler;
+import NetStuff.Server.User;
 
 import java.io.*;
 import java.net.BindException;
