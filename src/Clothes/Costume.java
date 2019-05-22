@@ -81,6 +81,10 @@ public class Costume implements Comparable, Serializable {
         return underwear;
     }
 
+    public OffsetDateTime getInitDate() {
+        return initDate;
+    }
+
     public void setUnderwear(Underwear underwear) {
         this.underwear = underwear;
     }
