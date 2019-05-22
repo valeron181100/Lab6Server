@@ -1,15 +1,19 @@
-package NetStuff.Server;
+package NetStuff.Net;
+
+import mainpkg.Main;
 
 import java.io.Serializable;
 
 public class User implements Serializable {
     private String password;
     private String login;
+    private String email;
     private boolean isLoggedIn;
 
-    public User(String login, String password){
+    public User(String login, String password, String email){
         this.login = login;
         this.password = password;
+        this.email = email;
         isLoggedIn = false;
     }
 
@@ -41,6 +45,14 @@ public class User implements Serializable {
         return password;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "ПОльзователь " + login;
@@ -65,10 +77,10 @@ public class User implements Serializable {
     @Override
     public int hashCode() {
         int prime = 5;
-        int result = 1;
-        int isLogged = isLoggedIn ? 1 : 0;
-        result = (int)(result * Math.pow(prime,1) + login.hashCode() * Math.pow(prime,2) +
-                password.hashCode() * Math.pow(prime,3));
+        int result = 18;
+        result = result * prime + Main.strHashCode(login) * (int) Math.pow(prime,2);
+        result = result * prime + Main.strHashCode(password) * (int) Math.pow(prime,3);
+        result = result * prime + Main.strHashCode(email) * (int) Math.pow(prime,4);
         return result;
     }
 }

@@ -1,4 +1,4 @@
-package NetStuff.Server;
+package NetStuff.Net;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;

@@ -20,6 +20,7 @@ public class MailSender {
 
 
     public void send(String theme, String message, String toEmail){
+        System.out.println("Отправка сообщения!");
         java.util.Properties props = new java.util.Properties();
         props.put("mail.smtp.host", service.getHost());
         props.put("mail.smtp.port", service.getPort());
@@ -49,5 +50,7 @@ public class MailSender {
         } catch (javax.mail.MessagingException e) {
             e.printStackTrace();
         }
+
+        System.out.println("Отправлено!");
     }
 }

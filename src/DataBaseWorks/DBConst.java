@@ -10,6 +10,7 @@ public class DBConst {
 
     public static final String TABLES_ID = "id";
     public static final String COSTUMES_NAME = "name";
+    public static final String COSTUMES_INITDATE = "init_date";
 
     public static final String TOPCLOTHES_HANDLENGTH = "hand_sm_length";
     public static final String TOPCLOTHES_ISHOOD = "is_hood";

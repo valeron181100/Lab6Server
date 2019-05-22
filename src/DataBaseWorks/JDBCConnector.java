@@ -21,8 +21,9 @@ public class JDBCConnector {
         String costumes_table = String.format("CREATE TABLE IF NOT EXISTS %s(\n" +
                 "                         %s INT,\n" +
                 "                         %s VARCHAR,\n" +
+                "                         %s VARCHAR,\n" +
                 "                         PRIMARY KEY(id)\n" +
-                ");", DBConst.COSTUME_TABLE, DBConst.TABLES_ID, DBConst.COSTUMES_NAME);
+                ");", DBConst.COSTUME_TABLE, DBConst.TABLES_ID, DBConst.COSTUMES_NAME, DBConst.COSTUMES_INITDATE);
 
         String topClothes_table = String.format("CREATE TABLE IF NOT EXISTS %s(\n" +
                 "                         %s INT,\n" +

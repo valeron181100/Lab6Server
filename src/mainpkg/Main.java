@@ -2,9 +2,11 @@ package mainpkg;
 
 import Clothes.Costume;
 import FileSystem.UsersVariables;
-import NetStuff.Server.Client;
-import NetStuff.Server.ServerThreadHandler;
-import NetStuff.Server.User;
+import NetStuff.Mail.MailSender;
+import NetStuff.Mail.MailService;
+import NetStuff.Net.Client;
+import NetStuff.Net.ServerThreadHandler;
+import NetStuff.Net.User;
 
 import java.io.*;
 import java.net.BindException;
@@ -29,6 +31,8 @@ public class Main {
     public static final String DEFAULT_CHAR_SET = "UTF-8";
 
     public static Set<Pair<Costume, String>> objectsHashSet = ConcurrentHashMap.newKeySet();
+
+    public static MailSender mailSender = new MailSender(MailService.GMAIL, "valeron.bondar181100@gmail.com", "Evgeniya1973");
 
     public static boolean writeCollection(Set<Pair<Costume, String>> collection){
         try (FileOutputStream writer = new FileOutputStream("collection.xml");
