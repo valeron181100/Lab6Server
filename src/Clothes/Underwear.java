@@ -1,12 +1,15 @@
 package Clothes;
 
+import DataBaseWorks.DBConst;
+import DataBaseWorks.iQuery;
 import Enums.Color;
 import Enums.Material;
+import mainpkg.Main;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class Underwear extends Clothes implements Serializable {
+public class Underwear extends Clothes implements Serializable, iQuery {
     private int sex_lvl;
 
     public Underwear(int size, Color color, Material material,
@@ -32,10 +35,13 @@ public class Underwear extends Clothes implements Serializable {
     @Override
     public int hashCode() {
         int prime = 14;
-        int result = 1;
-        result = prime * result + sex_lvl + getSize() +
-                getColor().toString().length() +
-                getName().length() + getMaterial().toString().length();
+        int result = prime + 23;
+        result = result * prime + sex_lvl * (int)Math.pow(prime, 2);
+        result = result * prime + (getIsForMan() ? (int)Math.pow(prime, 3) : 0);
+        result = result * prime + getSize() * (int)Math.pow(prime, 4);
+        result = result * prime + getColor().ordinal() * (int)Math.pow(prime, 5);
+        result = result * prime + Main.strHashCode(getName());
+        result = result * prime + getMaterial().ordinal()  * (int)Math.pow(prime, 6);
         return result;
     }
 
@@ -67,6 +73,17 @@ public class Underwear extends Clothes implements Serializable {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public String getInsertSqlQuery() {
+        return String.format("INSERT INTO underwear VALUES (DEFAULT, %s, %s, '%s', '%s', '%s', CAST(%s AS BIT));",
+                sex_lvl, getSize(), getColor().toString(), getMaterial().toString(), getName(), getIsForMan() ? 1 : 0);
+    }
+
+    @Override
+    public String getDelSqlQuery() {
+        return "DELETE FROM "+ DBConst.UNDERWEAR_TABLE +" WHERE id=DEFAULT;";
     }
 
     public JSONObject getJson(){

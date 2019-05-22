@@ -1,12 +1,15 @@
 package Clothes;
 
+import DataBaseWorks.DBConst;
+import DataBaseWorks.iQuery;
 import Enums.Color;
 import Enums.Material;
+import mainpkg.Main;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class Hat extends Clothes implements Serializable {
+public class Hat extends Clothes implements Serializable, iQuery {
     private int cylinder_height_sm;
     private int visor_length_sm;
 
@@ -40,11 +43,14 @@ public class Hat extends Clothes implements Serializable {
     @Override
     public int hashCode() {
         int prime = 12;
-        int result = 1;
-        int forman = getIsForMan() ? 1 : 0;
-        result = prime * result + cylinder_height_sm + visor_length_sm +
-                forman + getSize() + getColor().toString().length() +
-                getName().length() + getMaterial().toString().length();
+        int result = prime + 23;
+        result = result * prime + cylinder_height_sm * (int)Math.pow(prime, 2);
+        result = result * prime + visor_length_sm * (int)Math.pow(prime, 3);
+        result = result * prime + (getIsForMan() ? (int)Math.pow(prime, 4):0);
+        result = result * prime + getSize() * (int)Math.pow(prime, 5);
+        result = result * prime + getColor().ordinal() * (int)Math.pow(prime, 6);
+        result = result * prime + Main.strHashCode(getName());
+        result = result * prime + getMaterial().ordinal()  * (int)Math.pow(prime, 7);
         return result;
     }
 
@@ -78,6 +84,17 @@ public class Hat extends Clothes implements Serializable {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public String getInsertSqlQuery() {
+        return String.format("INSERT INTO hats VALUES (DEFAULT, %s, %s, %s, '%s', '%s', '%s', CAST(%s AS BIT));",
+                cylinder_height_sm, visor_length_sm, getSize(), getColor().toString(), getMaterial().toString(), getName(), getIsForMan() ? 1 : 0);
+    }
+
+    @Override
+    public String getDelSqlQuery() {
+        return "DELETE FROM "+ DBConst.HATS_TABLE +" WHERE id=DEFAULT;";
     }
 
     public JSONObject getJson(){

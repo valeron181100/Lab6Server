@@ -1,12 +1,14 @@
 package Clothes;
 
+import DataBaseWorks.*;
 import Enums.Color;
 import Enums.Material;
+import mainpkg.Main;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class DownClothes extends Clothes implements Serializable {
+public class DownClothes extends Clothes implements Serializable, iQuery {
     private int leg_length_sm;
     private int diametr_leg_sm;
 
@@ -40,12 +42,16 @@ public class DownClothes extends Clothes implements Serializable {
     @Override
     public int hashCode() {
         int prime = 11;
-        int result = 1;
-        int forman = getIsForMan() ? 1 : 0;
-        result = prime * result + leg_length_sm + diametr_leg_sm +
-                forman + getSize() + getColor().toString().length() +
-                getName().length() + getMaterial().toString().length();
+        int result = prime + 23;
+        result = result * prime + leg_length_sm * (int)Math.pow(prime, 2);
+        result = result * prime + diametr_leg_sm * (int)Math.pow(prime, 3);
+        result = result * prime + (getIsForMan() ? (int)Math.pow(prime, 4):0);
+        result = result * prime + getSize() * (int)Math.pow(prime, 5);
+        result = result * prime + getColor().ordinal() * (int)Math.pow(prime, 6);
+        result = result * prime + Main.strHashCode(getName());
+        result = result * prime + getMaterial().ordinal()  * (int)Math.pow(prime, 7);
         return result;
+
     }
 
     @Override
@@ -78,6 +84,18 @@ public class DownClothes extends Clothes implements Serializable {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public String getInsertSqlQuery() {
+        String result = String.format("INSERT INTO down_clothes VALUES (DEFAULT, %s, %s, %s, '%s', '%s', '%s', CAST(%s AS BIT));",
+                leg_length_sm, diametr_leg_sm, getSize(), getColor().toString(), getMaterial().toString(), getName(), getIsForMan() ? 1 : 0);
+        return result;
+    }
+
+    @Override
+    public String getDelSqlQuery() {
+        return "DELETE FROM "+ DBConst.DOWNCLOTHES_TABLE +" WHERE id=DEFAULT;";
     }
 
     public JSONObject getJson(){

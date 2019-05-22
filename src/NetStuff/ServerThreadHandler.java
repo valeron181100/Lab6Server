@@ -161,6 +161,4 @@ public class ServerThreadHandler implements Runnable {
             System.err.println("Ошибка при отправке!");
         }
     }
-
-
 }

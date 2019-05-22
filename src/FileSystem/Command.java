@@ -61,7 +61,7 @@ public enum Command {
                     "Аргумент команды неверный!".getBytes(Main.DEFAULT_CHAR_SET))));
         }
 
-    }), ///Done
+    }),
 
     SHOW((command,transferPackage)->{
         command.setData(null);
@@ -77,7 +77,7 @@ public enum Command {
         command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, output[0].getBytes(Main.DEFAULT_CHAR_SET))));
 
         System.out.println("Команда выполнена.");
-    }),  ///Done
+    }),
     ADD_IF_MAX((command,transferPackage)->{
         try {
 
@@ -128,7 +128,7 @@ public enum Command {
             command.setData(Stream.of(new TransferPackage(-1, "Команда не выполнена.", null,
                     "Аргумент команды неверный!".getBytes(Main.DEFAULT_CHAR_SET))));
         }
-    }), ///Done
+    }),
     LOAD((command,transferPackage)->{
         User user = transferPackage.getUser();
         Stream<Pair<Costume, String>> concatStream = Stream.concat(command.getObjectsHashSet().stream(), transferPackage.getData().map(p -> new Pair<>(p, user.getLogin())));
@@ -178,7 +178,7 @@ public enum Command {
         }
         command.setData(Stream.of(new TransferPackage(6, "Команда выполнена.", null, path.getBytes(Main.DEFAULT_CHAR_SET))));
         System.out.println("Первый этап импорта пройден.");
-    }),     ///Done
+    }),
 
     @SuppressWarnings("unchecked")
     I1A8S1D1F0G0H((command,transferPackage)->{
@@ -197,7 +197,7 @@ public enum Command {
         } catch (IOException | ClassNotFoundException e) {
             System.err.println(e.getMessage());
         }
-    }),     ///Done
+    }),
 
     ADD((command,transferPackage)->{
         try {
@@ -236,7 +236,7 @@ public enum Command {
             command.setData(Stream.of(new TransferPackage(-1, "Команда не выполнена.", null,
                     "Аргумент команды неверный!".getBytes(Main.DEFAULT_CHAR_SET))));
         }
-    }),     ///Done
+    }),
     START((command,transferPackage)->{
 
         User user = transferPackage.getUser();
@@ -262,7 +262,7 @@ public enum Command {
     EXIT((command,transferPackage)->{
         command.setData(Stream.of(new TransferPackage(9, "Команда выполнена.", null, "null".getBytes(Main.DEFAULT_CHAR_SET))));
         System.out.println("Команда выполнена.");
-    }),     ///Done
+    }),
     HELP((command,transferPackage)->{
         command.setData(Stream.of(new TransferPackage(11, "Команда выполнена.", null,
                 ("В программе реализован многострочный ввод, стоп-символом является знак '$'(Например: cmd {...}$)\n" +
@@ -283,7 +283,7 @@ public enum Command {
                 "Пример правильного формата ввода объекта json: \n" +
                 "{\"topClothes\":{\"growth_sm\":170,\"size\":50,\"color\":\"White\",\"material\":\"Chlopoc\",\"is_hood\":false,\"name\":\"T-Shirt\",\"is_for_man\":true,\"hand_sm_length\":60},\"downClothes\":{\"size\":50,\"color\":\"Black\",\"material\":\"Chlopoc\",\"diametr_leg_sm\":40,\"name\":\"Trousers\",\"leg_length_sm\":70,\"is_for_man\":true},\"underwear\":{\"sex_lvl\":100,\"size\":50,\"color\":\"Red\",\"material\":\"Chlopoc\",\"name\":\"Panties\",\"is_for_man\":true},\"hat\":{\"cylinder_height_sm\":15,\"size\":50,\"color\":\"White\",\"material\":\"Len\",\"visor_length_sm\":20,\"name\":\"BaseballHat\",\"is_for_man\":true},\"shoes\":{\"is_shoelaces\":true,\"size\":38,\"color\":\"White\",\"material\":\"Leather\",\"outsole_material\":\"Rubber\",\"name\":\"Sneackers\",\"is_for_man\":true}}"
         ).getBytes())));
-    }),     ///Done
+    }),
     CHANGE_DEF_FILE_PATH(((command,transferPackage) -> {
         String strData = "";
         for(Object s : command.data.toArray()) strData += s.toString();
@@ -315,7 +315,7 @@ public enum Command {
 
         command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
         System.out.println("Команда выполнена.");
-    }),     ///Done
+    }),
     LOGIN(((command, transferPackage) -> {
         String logPas = (String)command.data.findFirst().get();
         String[] lpArgs = logPas.split("\\|");

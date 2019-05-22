@@ -1,10 +1,12 @@
 package Clothes;
 
+import DataBaseWorks.DBConst;
 import Enums.Color;
 import Enums.Material;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Costume implements Comparable, Serializable {
     private TopClothes topClothes;
@@ -96,10 +98,12 @@ public class Costume implements Comparable, Serializable {
     @Override
     public int hashCode() {
         int prime = 10;
-        int result = 1;
-        result = prime * result + topClothes.hashCode() +
-                downClothes.hashCode() + shoes.hashCode() +
-                hat.hashCode() + underwear.hashCode();
+        int result = prime + 23;
+        result = result * prime + downClothes.hashCode();
+        result = result * prime + hat.hashCode();
+        result = result * prime + shoes.hashCode();
+        result = result * prime + topClothes.hashCode();
+        result = result * prime + underwear.hashCode();
         return result;
     }
 
@@ -127,7 +131,35 @@ public class Costume implements Comparable, Serializable {
 
     @Override
     public String toString(){
-        return "Costume № " + this.hashCode();
+        return "Costume № " + Math.abs(this.hashCode() % 7);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.hashCode() - ((Costume)o).hashCode();
+    }
+
+
+    public ArrayList<String> getInsertSQLQueries(){
+        ArrayList<String> queries = new ArrayList<>(6);
+        queries.add("INSERT INTO costumes VALUES ("+ this.hashCode() +", '" + this.toString() + "');");
+        queries.add(downClothes.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(hat.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(shoes.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(topClothes.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(underwear.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        return queries;
+    }
+
+    public ArrayList<String> getDelSQLQueries(){
+        ArrayList<String> queries = new ArrayList<>(6);
+        queries.add("DELETE FROM "+ DBConst.COSTUME_TABLE +" WHERE id=" + this.hashCode() + ";");
+        queries.add(downClothes.getDelSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(hat.getDelSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(shoes.getDelSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(topClothes.getDelSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        queries.add(underwear.getDelSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
+        return queries;
     }
 
     public JSONObject getJson(){
@@ -140,11 +172,5 @@ public class Costume implements Comparable, Serializable {
         mainJson.put("underwear", this.underwear.getJson());
 
         return mainJson;
-    }
-
-
-    @Override
-    public int compareTo(Object o) {
-        return this.hashCode() - ((Costume)o).hashCode();
     }
 }

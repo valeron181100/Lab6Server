@@ -1,12 +1,15 @@
 package Clothes;
 
+import DataBaseWorks.DBConst;
+import DataBaseWorks.iQuery;
 import Enums.Color;
 import Enums.Material;
+import mainpkg.Main;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class TopClothes extends Clothes implements Serializable {
+public class TopClothes extends Clothes implements Serializable, iQuery {
     private int hand_sm_length;
     private boolean is_hood;
     private int growth_sm;
@@ -47,12 +50,15 @@ public class TopClothes extends Clothes implements Serializable {
     @Override
     public int hashCode() {
         int prime = 15;
-        int result = 1;
-        int hood = is_hood ? 1 : 0;
-        int forman = getIsForMan() ? 1 : 0;
-        result = prime * result + hand_sm_length + growth_sm + hood +
-                forman + getSize() + getColor().toString().length() +
-                getName().length() + getMaterial().toString().length();
+        int result = prime + 23;
+        result = result * prime + growth_sm * (int)Math.pow(prime, 2);
+        result = result * prime + hand_sm_length * (int)Math.pow(prime, 3);
+        result = result * prime + (is_hood ? (int)Math.pow(prime, 4) : 0);
+        result = result * prime + (getIsForMan() ? (int)Math.pow(prime, 5):0);
+        result = result * prime + getSize() * (int)Math.pow(prime, 6);
+        result = result * prime + getColor().ordinal() * (int)Math.pow(prime, 7);
+        result = result * prime + Main.strHashCode(getName());
+        result = result * prime + getMaterial().ordinal()  * (int)Math.pow(prime, 8);
         return result;
     }
 
@@ -88,6 +94,17 @@ public class TopClothes extends Clothes implements Serializable {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public String getInsertSqlQuery() {
+        return String.format("INSERT INTO top_clothes VALUES (DEFAULT, %s, CAST(%s AS BIT), %s, %s, '%s', '%s', '%s', CAST(%s AS BIT));",
+                hand_sm_length, is_hood ? 1 : 0, growth_sm, getSize(), getColor().toString(), getMaterial().toString(), getName(), getIsForMan() ? 1 : 0);
+    }
+
+    @Override
+    public String getDelSqlQuery() {
+        return "DELETE FROM "+ DBConst.TOPCLOTHES_TABLE +" WHERE id=DEFAULT;";
     }
 
     public JSONObject getJson(){

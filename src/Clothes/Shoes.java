@@ -1,12 +1,15 @@
 package Clothes;
 
+import DataBaseWorks.DBConst;
+import DataBaseWorks.iQuery;
 import Enums.Color;
 import Enums.Material;
+import mainpkg.Main;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class Shoes extends Clothes implements Serializable {
+public class Shoes extends Clothes implements Serializable, iQuery {
     private boolean is_shoelaces;
     private Material outsole_material;
 
@@ -40,12 +43,14 @@ public class Shoes extends Clothes implements Serializable {
     @Override
     public int hashCode() {
         int prime = 13;
-        int result = 1;
-        int shoelaces = is_shoelaces ? 1 : 0;
-        int forman = getIsForMan() ? 1 : 0;
-        result = prime * result + shoelaces + forman +
-                forman + getSize() + getColor().toString().length() +
-                getName().length() + getMaterial().toString().length();
+        int result = prime + 23;
+        result = result * prime + (getIsForMan() ? (int)Math.pow(prime, 2):0);
+        result = result * prime + outsole_material.ordinal()  * (int)Math.pow(prime, 3);
+        result = result * prime + (getIsForMan() ? (int)Math.pow(prime, 4):0);
+        result = result * prime + getSize() * (int)Math.pow(prime, 5);
+        result = result * prime + getColor().ordinal() * (int)Math.pow(prime, 6);
+        result = result * prime + Main.strHashCode(getName());
+        result = result * prime + getMaterial().ordinal()  * (int)Math.pow(prime, 7);
         return result;
     }
 
@@ -79,6 +84,17 @@ public class Shoes extends Clothes implements Serializable {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public String getInsertSqlQuery() {
+        return String.format("INSERT INTO shoes VALUES (DEFAULT, '%s', CAST(%s AS BIT), %s, '%s', '%s', '%s', CAST(%s AS BIT));",
+                outsole_material.toString(), is_shoelaces ? 1 : 0, getSize(), getColor().toString(), getMaterial().toString(), getName(), getIsForMan() ? 1 : 0);
+    }
+
+    @Override
+    public String getDelSqlQuery() {
+        return "DELETE FROM "+ DBConst.SHOES_TABLE +" WHERE id=DEFAULT;";
     }
 
     public JSONObject getJson(){
