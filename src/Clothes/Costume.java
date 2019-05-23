@@ -24,7 +24,7 @@ public class Costume implements Comparable, Serializable {
         this.shoes = shoes;
         this.hat = hat;
         underwear = under;
-        initDate = OffsetDateTime.now(ZoneId.of("Russia/Moscow"));
+        initDate = OffsetDateTime.now(ZoneId.of("Europe/Moscow"));
     }
 
     public Costume(){
@@ -33,7 +33,7 @@ public class Costume implements Comparable, Serializable {
         this.shoes = new Shoes(38, Color.White, Material.Leather, "Sneackers", true, true, Material.Rubber);
         this.hat = new Hat(50, Color.White, Material.Len, "BaseballHat", true, 15, 20);
         underwear = new Underwear(30, Color.Black, Material.Chlopoc, "Panties", true, 100);
-        initDate = OffsetDateTime.now(ZoneId.of("Russia/Moscow"));
+        initDate = OffsetDateTime.now(ZoneId.of("Europe/Moscow"));
     }
 
     public Costume(JSONObject object){
@@ -42,7 +42,7 @@ public class Costume implements Comparable, Serializable {
         this.shoes = new Shoes(object.getJSONObject("shoes"));
         this.hat = new Hat(object.getJSONObject("hat"));
         this.underwear = new Underwear(object.getJSONObject("underwear"));
-        initDate = OffsetDateTime.now(ZoneId.of("Russia/Moscow"));
+        initDate = OffsetDateTime.now(ZoneId.of("Europe/Moscow"));
     }
 
     public TopClothes getTopClothes() {

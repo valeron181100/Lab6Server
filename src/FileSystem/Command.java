@@ -134,6 +134,7 @@ public enum Command {
         Stream<Pair<Costume, String>> concatStream = Stream.concat(command.getObjectsHashSet().stream(), transferPackage.getData().map(p -> new Pair<>(p, user.getLogin())));
         HashSet<Pair<Costume, String>> set = new HashSet<>(concatStream.collect(Collectors.toSet()));
         command.getObjectsHashSet().addAll(set);
+        Main.controller.addAllCostumesToDB(set.stream().map(p -> p.getKey()).collect(Collectors.toSet()));
         command.setData(Stream.of(new TransferPackage(4, "Команда выполнена.", null, "Load collection to server".getBytes(Main.DEFAULT_CHAR_SET))));
         Main.writeCollection(Main.getObjectsHashSet());
         System.out.println("Команда выполнена.");

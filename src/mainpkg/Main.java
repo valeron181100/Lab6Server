@@ -1,6 +1,8 @@
 package mainpkg;
 
 import Clothes.Costume;
+import DataBaseWorks.DBController;
+import DataBaseWorks.JDBCConnector;
 import FileSystem.UsersVariables;
 import NetStuff.Mail.MailSender;
 import NetStuff.Mail.MailService;
@@ -44,6 +46,14 @@ public class Main {
         }
         System.out.println("Writing was ended!");
         return true;
+    }
+
+    public static JDBCConnector jdbcConnector;
+    public static DBController controller;
+
+    static {
+        jdbcConnector = new JDBCConnector();
+        controller = new DBController(jdbcConnector);
     }
 
     @SuppressWarnings("unchecked")
