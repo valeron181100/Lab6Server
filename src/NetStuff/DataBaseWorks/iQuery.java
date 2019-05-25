@@ -1,4 +1,4 @@
-package DataBaseWorks;
+package NetStuff.DataBaseWorks;
 
 public interface iQuery {
     String getInsertSqlQuery();

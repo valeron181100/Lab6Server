@@ -1,4 +1,6 @@
-package DataBaseWorks;
+package NetStuff.DataBaseWorks;
+
+import mainpkg.Pair;
 
 import java.sql.*;
 
@@ -111,11 +113,20 @@ public class JDBCConnector {
         return connection;
     }
 
-    public ResultSet execSQLQuery(String query){
-        try (PreparedStatement statement = connection.
-                prepareStatement(query)) {
+    /**
+     * Executing a query and returning resultSet. After calling this method and processing resultSet, you must call PreparedStatement.close() method.
+     * @param query SQL query
+     * @return Pair of PreparedStatement and ResultSet
+     */
+    public Pair<PreparedStatement, ResultSet> execSQLQuery(String query){
+        try {
+            PreparedStatement statement = connection.
+                    prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
-            return resultSet;
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnNum = metaData.getColumnCount();
+            int k = 0;
+            return new Pair<>(statement,resultSet);
         } catch (SQLException e) {
             System.err.println(e.getMessage());
             return null;

@@ -1,4 +1,4 @@
-package DataBaseWorks;
+package NetStuff.DataBaseWorks;
 
 public class DBConfigs {
     protected String dbHost = "localhost";

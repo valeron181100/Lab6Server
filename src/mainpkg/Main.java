@@ -1,8 +1,8 @@
 package mainpkg;
 
 import Clothes.Costume;
-import DataBaseWorks.DBController;
-import DataBaseWorks.JDBCConnector;
+import NetStuff.DataBaseWorks.DBController;
+import NetStuff.DataBaseWorks.JDBCConnector;
 import FileSystem.UsersVariables;
 import NetStuff.Mail.MailSender;
 import NetStuff.Mail.MailService;

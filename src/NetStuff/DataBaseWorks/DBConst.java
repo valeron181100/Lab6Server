@@ -1,4 +1,4 @@
-package DataBaseWorks;
+package NetStuff.DataBaseWorks;
 
 public class DBConst {
     public static final String COSTUME_TABLE = "costumes";

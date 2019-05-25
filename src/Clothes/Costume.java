@@ -1,6 +1,6 @@
 package Clothes;
 
-import DataBaseWorks.DBConst;
+import NetStuff.DataBaseWorks.DBConst;
 import Enums.Color;
 import Enums.Material;
 import org.json.JSONObject;

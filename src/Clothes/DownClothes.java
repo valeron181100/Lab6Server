@@ -1,6 +1,7 @@
 package Clothes;
 
-import DataBaseWorks.*;
+import NetStuff.DataBaseWorks.DBConst;
+import NetStuff.DataBaseWorks.iQuery;
 import Enums.Color;
 import Enums.Material;
 import mainpkg.Main;
