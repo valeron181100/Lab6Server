@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 
 public class DBController {
@@ -43,14 +44,6 @@ public class DBController {
     public void removeCostumeFromDB(Costume costume){
         costume.getDelSQLQueries().forEach(query ->
                 connector.execSQLUpdate(query));
-    }
-
-    public void addUserToDB(User user){
-        connector.execSQLUpdate(user.getInsertSqlQuery());
-    }
-
-    public void removeUserFromDB(User user){
-        connector.execSQLUpdate(user.getDelSqlQuery());
     }
 
     public void removeAllCostumesFromDB(Collection<Costume> costumes){
@@ -119,5 +112,46 @@ public class DBController {
         }
 
         return costumes;
+    }
+
+    public void addUserToDB(User user){
+        connector.execSQLUpdate(user.getInsertSqlQuery());
+    }
+
+    public void removeUserFromDB(User user){
+        connector.execSQLUpdate(user.getDelSqlQuery());
+    }
+
+    public List<User> getAllUsersFromDB() throws SQLException {
+        Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT * FROM users;");
+        ResultSet set = resultPair.getValue();
+        List<User> users = new ArrayList<>();
+        while(set.next()){
+            users.add(new User(set.getString("login"), set.getString("password"), set.getString("email")));
+        }
+        resultPair.getKey().close();
+        return users;
+    }
+
+    public boolean isUserExistsInDB(User user) throws SQLException{
+        Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT users.login FROM users;");
+        ResultSet set = resultPair.getValue();
+        if(set.next()){
+            if(set.getString("login").equals(user.getLogin())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isUserCorrectInDB(User user) throws SQLException{
+        Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT users.login, users.password FROM users;");
+        ResultSet set = resultPair.getValue();
+        if(set.next()){
+            if(set.getString("login").equals(user.getLogin()) && set.getString("password").equals(user.getPassword())){
+                return true;
+            }
+        }
+        return false;
     }
 }

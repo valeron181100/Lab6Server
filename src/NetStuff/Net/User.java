@@ -19,6 +19,12 @@ public class User implements Serializable, iQuery {
         isLoggedIn = false;
     }
 
+    public User(String login, String password){
+        this.login = login;
+        this.password = password;
+        isLoggedIn = false;
+    }
+
     public User(){
         isLoggedIn = false;
     }
@@ -89,7 +95,10 @@ public class User implements Serializable, iQuery {
 
     @Override
     public String getInsertSqlQuery() {
-        return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", "+ this.getLogin() +", "+this.getPassword()+");";
+        if(email == null)
+            return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", "+ this.getLogin() +", "+this.getPassword()+");";
+        else
+            return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", "+ this.getLogin() +", "+this.getPassword() +", "+this.getEmail()+");";
     }
 
     @Override

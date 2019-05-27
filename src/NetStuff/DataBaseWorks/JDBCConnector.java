@@ -112,8 +112,9 @@ public class JDBCConnector extends DBConfigs {
                 "                         %s INT,\n" +
                 "                         %s VARCHAR,\n" +
                 "                         %s VARCHAR,\n" +
+                "                         %s VARCHAR,\n" +
                 "                         PRIMARY KEY(id)\n" +
-                ");", DBConst.USERS_TABLE, DBConst.TABLES_ID, DBConst.USERS_LOGIN, DBConst.USERS_PASSWORD);
+                ");", DBConst.USERS_TABLE, DBConst.TABLES_ID, DBConst.USERS_LOGIN, DBConst.USERS_PASSWORD, DBConst.USERS_EMAIL);
 
         execSQLUpdate(costumes_table);
         execSQLUpdate(downClothes_table);
