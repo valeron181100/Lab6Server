@@ -3,12 +3,16 @@ package NetStuff.DataBaseWorks;
 import mainpkg.Pair;
 
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class JDBCConnector {
+public class JDBCConnector extends DBConfigs {
 
-    private final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
-    private final String USER = "postgres";
-    private final String PASS = "va181100";
+    private final String DB_URL = "jdbc:postgresql://"+dbHost+":"+dbPort+"/" + dbName;
+    private final String USER = dbUser;
+    private final String PASS = dbPassword;
+
+    private static final Logger logger = Logger.getLogger(JDBCConnector.class.getSimpleName());
 
     private Connection connection;
 
@@ -24,8 +28,9 @@ public class JDBCConnector {
                 "                         %s INT,\n" +
                 "                         %s VARCHAR,\n" +
                 "                         %s VARCHAR,\n" +
+                "                         %s VARCHAR,\n" +
                 "                         PRIMARY KEY(id)\n" +
-                ");", DBConst.COSTUME_TABLE, DBConst.TABLES_ID, DBConst.COSTUMES_NAME, DBConst.COSTUMES_INITDATE);
+                ");", DBConst.COSTUME_TABLE, DBConst.TABLES_ID, DBConst.COSTUMES_NAME, DBConst.COSTUMES_INITDATE, DBConst.COSTUMES_USER);
 
         String topClothes_table = String.format("CREATE TABLE IF NOT EXISTS %s(\n" +
                 "                         %s INT,\n" +
@@ -101,12 +106,23 @@ public class JDBCConnector {
                 "                         PRIMARY KEY(id)\n" +
                 ");", DBConst.UNDERWEAR_TABLE, DBConst.TABLES_ID, DBConst.UNDERWEAR_SEXLVL,
                 DBConst.TABLES_SIZE, DBConst.TABLES_COLOR, DBConst.TABLES_MATERIAL, DBConst.TABLES_NAME, DBConst.TABLES_ISFORMAN);
+
+
+        String users_table = String.format("CREATE TABLE IF NOT EXISTS %s(\n" +
+                "                         %s INT,\n" +
+                "                         %s VARCHAR,\n" +
+                "                         %s VARCHAR,\n" +
+                "                         PRIMARY KEY(id)\n" +
+                ");", DBConst.USERS_TABLE, DBConst.TABLES_ID, DBConst.USERS_LOGIN, DBConst.USERS_PASSWORD);
+
         execSQLUpdate(costumes_table);
         execSQLUpdate(downClothes_table);
         execSQLUpdate(topClothes_table);
         execSQLUpdate(hats_table);
         execSQLUpdate(shoes_table);
         execSQLUpdate(underwear_table);
+        execSQLUpdate(users_table);
+        int k =0;
     }
 
     public Connection getConnection() {
@@ -128,7 +144,7 @@ public class JDBCConnector {
             int k = 0;
             return new Pair<>(statement,resultSet);
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.info(e.getMessage());
             return null;
         }
     }
@@ -139,7 +155,7 @@ public class JDBCConnector {
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.info(e.getMessage());
             return false;
         }
     }

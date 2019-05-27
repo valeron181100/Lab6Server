@@ -152,7 +152,7 @@ public class Costume implements Comparable, Serializable {
 
     public ArrayList<String> getInsertSQLQueries(){
         ArrayList<String> queries = new ArrayList<>(6);
-        queries.add("INSERT INTO costumes VALUES ("+ this.hashCode() +", '" + this.toString() + "', '" + initDate.toString() + "');");
+        queries.add("INSERT INTO costumes VALUES ("+ this.hashCode() +", '" + this.toString() + "', '" + initDate.toString() + "', 'USER');");
         queries.add(downClothes.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
         queries.add(hat.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));
         queries.add(shoes.getInsertSqlQuery().replace("DEFAULT", String.valueOf(this.hashCode())));

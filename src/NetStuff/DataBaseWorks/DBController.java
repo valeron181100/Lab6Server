@@ -3,6 +3,7 @@ package NetStuff.DataBaseWorks;
 import Clothes.*;
 import Enums.Color;
 import Enums.Material;
+import NetStuff.Net.User;
 import mainpkg.Pair;
 
 import java.sql.PreparedStatement;
@@ -28,6 +29,15 @@ public class DBController {
 
     public void addAllCostumesToDB(Collection<Costume> costumes){
         costumes.forEach(this::addCostumeToDB);
+    }
+
+    public void addCostumeToDB(Costume costume, User user){
+        costume.getInsertSQLQueries().forEach(query ->
+                connector.execSQLUpdate(query.replace("USER" , user.getLogin())));
+    }
+
+    public void addAllCostumesToDB(Collection<Costume> costumes, User user){
+        costumes.forEach(p -> addCostumeToDB(p,user));
     }
 
     public void removeCostumeFromDB(Costume costume){

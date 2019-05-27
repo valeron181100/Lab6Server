@@ -1,10 +1,12 @@
 package NetStuff.Net;
 
+import NetStuff.DataBaseWorks.DBConst;
+import NetStuff.DataBaseWorks.iQuery;
 import mainpkg.Main;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
+public class User implements Serializable, iQuery {
     private String password;
     private String login;
     private String email;
@@ -80,7 +82,18 @@ public class User implements Serializable {
         int result = 18;
         result = result * prime + Main.strHashCode(login) * (int) Math.pow(prime,2);
         result = result * prime + Main.strHashCode(password) * (int) Math.pow(prime,3);
-        result = result * prime + Main.strHashCode(email) * (int) Math.pow(prime,4);
+        if(email != null)
+            result = result * prime + Main.strHashCode(email) * (int) Math.pow(prime,4);
         return result;
+    }
+
+    @Override
+    public String getInsertSqlQuery() {
+        return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", "+ this.getLogin() +", "+this.getPassword()+");";
+    }
+
+    @Override
+    public String getDelSqlQuery() {
+        return "DELETE FROM " + DBConst.USERS_TABLE + " WHERE " + DBConst.TABLES_ID + "=" + this.hashCode() + ";";
     }
 }

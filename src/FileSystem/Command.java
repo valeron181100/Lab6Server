@@ -134,7 +134,7 @@ public enum Command {
         Stream<Pair<Costume, String>> concatStream = Stream.concat(command.getObjectsHashSet().stream(), transferPackage.getData().map(p -> new Pair<>(p, user.getLogin())));
         HashSet<Pair<Costume, String>> set = new HashSet<>(concatStream.collect(Collectors.toSet()));
         command.getObjectsHashSet().addAll(set);
-        Main.controller.addAllCostumesToDB(set.stream().map(p -> p.getKey()).collect(Collectors.toSet()));
+        Main.controller.addAllCostumesToDB(set.stream().map(p -> p.getKey()).collect(Collectors.toSet()), user);
         command.setData(Stream.of(new TransferPackage(4, "Команда выполнена.", null, "Load collection to server".getBytes(Main.DEFAULT_CHAR_SET))));
         Main.writeCollection(Main.getObjectsHashSet());
         System.out.println("Команда выполнена.");
@@ -341,7 +341,7 @@ public enum Command {
            }
         });
         if(!isUserOnline[0]) {
-            if (UsersVariables.users.containsKey(user)) {
+            if (UsersVariables.users.entrySet().stream().map(p -> p.getKey()).collect(Collectors.toList()).contains(user)) {
                 UsersVariables.onlineUsers.put(user, command.getAddress());
                 command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
                         new byte[]{2})));
@@ -454,7 +454,7 @@ public enum Command {
         String jsonRegex = "\\{\"topClothes\":\\{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"(.+)\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":\\{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"(.+)\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":\\{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"(.+)\",\"is_for_man\":(true|false)},\"hat\":\\{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"(.+)\",\"is_for_man\":(true|false)},\"shoes\":\\{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"(.+)\",\"is_for_man\":(true|false)}}";
         String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.+}";
         String nodataCommandRegex = "show|load|info|start|exit|help|save|I1A8S1D1F0G0H|trimToMin";
-        String loginRegex = "login \\{.+} \\{.+} \\{.+}";
+        String loginRegex = "login \\{.+} \\{.+}( \\{.+})?";
 
         if(jsonInput.matches(dataCommandRegex)){
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();

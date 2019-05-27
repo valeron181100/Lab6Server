@@ -7,10 +7,12 @@ public class DBConst {
     public static final String HATS_TABLE = "hats";
     public static final String SHOES_TABLE = "shoes";
     public static final String UNDERWEAR_TABLE = "underwear";
+    public static final String USERS_TABLE = "users";
 
     public static final String TABLES_ID = "id";
     public static final String COSTUMES_NAME = "name";
     public static final String COSTUMES_INITDATE = "init_date";
+    public static final String COSTUMES_USER = "user_login";
 
     public static final String TOPCLOTHES_HANDLENGTH = "hand_sm_length";
     public static final String TOPCLOTHES_ISHOOD = "is_hood";
@@ -32,4 +34,7 @@ public class DBConst {
     public static final String TABLES_MATERIAL = "material";
     public static final String TABLES_NAME = "name";
     public static final String TABLES_ISFORMAN = "is_for_man";
+
+    public static  final String USERS_LOGIN = "login";
+    public static  final String USERS_PASSWORD = "password";
 }
