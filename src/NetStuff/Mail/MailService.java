@@ -3,7 +3,7 @@ package NetStuff.Mail;
 public enum MailService {
 
     GMAIL("smtp.gmail.com","587"),
-    MAIL_RU("smtp.mail.ru","465");
+    OUTLOOK("SMTP.Office365.com","587");
 
 
     private String host;

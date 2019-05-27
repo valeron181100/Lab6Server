@@ -20,7 +20,7 @@ public class MailSender {
 
 
     public void send(String theme, String message, String toEmail){
-        System.out.println("Отправка сообщения!");
+        System.out.println("Sending email!");
         java.util.Properties props = new java.util.Properties();
         props.put("mail.smtp.host", service.getHost());
         props.put("mail.smtp.port", service.getPort());
@@ -47,10 +47,12 @@ public class MailSender {
 
 // Send the message.
             Transport.send(msg);
-        } catch (javax.mail.MessagingException e) {
-            e.printStackTrace();
+            System.out.println("Отправлено!");
+        }catch (AuthenticationFailedException e){
+            System.err.println("Error: invalid login or password!");
         }
-
-        System.out.println("Отправлено!");
+        catch (javax.mail.MessagingException e) {
+            System.err.println("Error: something went wrong sending email");
+        }
     }
 }
