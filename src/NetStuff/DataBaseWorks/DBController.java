@@ -45,6 +45,14 @@ public class DBController {
                 connector.execSQLUpdate(query));
     }
 
+    public void addUserToDB(User user){
+        connector.execSQLUpdate(user.getInsertSqlQuery());
+    }
+
+    public void removeUserFromDB(User user){
+        connector.execSQLUpdate(user.getDelSqlQuery());
+    }
+
     public void removeAllCostumesFromDB(Collection<Costume> costumes){
         costumes.forEach(this::removeCostumeFromDB);
     }
