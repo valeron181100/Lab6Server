@@ -96,9 +96,9 @@ public class User implements Serializable, iQuery {
     @Override
     public String getInsertSqlQuery() {
         if(email == null)
-            return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", "+ this.getLogin() +", "+this.getPassword()+");";
+            return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", '"+ this.getLogin() +"', '"+this.getPassword()+"', 'ADDRESS');";
         else
-            return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", "+ this.getLogin() +", "+this.getPassword() +", "+this.getEmail()+");";
+            return "INSERT INTO " + DBConst.USERS_TABLE + " VALUES("+this.hashCode() +", '"+ this.getLogin() +"', '"+this.getPassword() +"', '"+this.getEmail()+"', 'ADDRESS');";
     }
 
     @Override

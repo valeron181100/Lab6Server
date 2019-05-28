@@ -6,8 +6,12 @@ import Enums.Material;
 import NetStuff.Net.User;
 import mainpkg.Pair;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +29,7 @@ public class DBController {
 
     public void addCostumeToDB(Costume costume){
         costume.getInsertSQLQueries().forEach(query ->
-                connector.execSQLUpdate(query));
+                connector.execSQLUpdate(query.replace("DEFAULT", String.valueOf(costume.hashCode()))));
     }
 
     public void addAllCostumesToDB(Collection<Costume> costumes){
@@ -34,7 +38,9 @@ public class DBController {
 
     public void addCostumeToDB(Costume costume, User user){
         costume.getInsertSQLQueries().forEach(query ->
-                connector.execSQLUpdate(query.replace("USER" , user.getLogin())));
+                connector.execSQLUpdate(query.replace("USER" , user.getLogin()).replace("DEFAULT",
+                        String.valueOf(costume.hashCode() * 10 + user.hashCode() * 100)
+                        )));
     }
 
     public void addAllCostumesToDB(Collection<Costume> costumes, User user){
@@ -118,40 +124,52 @@ public class DBController {
         connector.execSQLUpdate(user.getInsertSqlQuery());
     }
 
+    public void addUserToDB(User user, SocketAddress address){
+        connector.execSQLUpdate(user.getInsertSqlQuery().replace("ADDRESS", ((InetSocketAddress)address).getAddress().toString() + "|" + ((InetSocketAddress)address).getPort()));
+    }
+
     public void removeUserFromDB(User user){
         connector.execSQLUpdate(user.getDelSqlQuery());
     }
 
-    public List<User> getAllUsersFromDB() throws SQLException {
+    public List<Pair<User, SocketAddress>> getAllUsersFromDB() throws SQLException {
         Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT * FROM users;");
         ResultSet set = resultPair.getValue();
-        List<User> users = new ArrayList<>();
+        List<Pair<User, SocketAddress>> users = new ArrayList<>();
         while(set.next()){
-            users.add(new User(set.getString("login"), set.getString("password"), set.getString("email")));
+            Pair<User, SocketAddress> pair = new Pair<>(
+                    new User(set.getString("login"), set.getString("password"), set.getString("email")),
+                    new InetSocketAddress(set.getString(DBConst.USERS_ADDRESS).split("\\|")[0], Integer.parseInt(set.getString(DBConst.USERS_ADDRESS).split("\\|")[1]))
+            );
+            users.add(pair);
         }
         resultPair.getKey().close();
         return users;
     }
 
-    public boolean isUserExistsInDB(User user) throws SQLException{
+    public boolean isUserExistsInDB(User user){
         Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT users.login FROM users;");
         ResultSet set = resultPair.getValue();
-        if(set.next()){
-            if(set.getString("login").equals(user.getLogin())){
-                return true;
+        try {
+            if (set.next()) {
+                if (set.getString("login").equals(user.getLogin())) {
+                    return true;
+                }
             }
-        }
+        }catch (SQLException e){}
         return false;
     }
 
     public boolean isUserCorrectInDB(User user) throws SQLException{
         Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT users.login, users.password FROM users;");
         ResultSet set = resultPair.getValue();
-        if(set.next()){
-            if(set.getString("login").equals(user.getLogin()) && set.getString("password").equals(user.getPassword())){
-                return true;
+        try {
+            if (set.next()) {
+                if (set.getString("login").equals(user.getLogin()) && set.getString("password").equals(user.getPassword())) {
+                    return true;
+                }
             }
-        }
+        }catch (SQLException e){}
         return false;
     }
 }

@@ -8,7 +8,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -66,8 +69,6 @@ public enum Command {
     SHOW((command,transferPackage)->{
         command.setData(null);
         User user = transferPackage.getUser();
-        ConcurrentHashMap<User, SocketAddress> onlineUsers = UsersVariables.onlineUsers;
-        ConcurrentHashMap<User, SocketAddress> users = UsersVariables.users;
 
         Set<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user.getLogin())).collect(Collectors.toSet());
         final String[] output = {""};
@@ -318,67 +319,74 @@ public enum Command {
         System.out.println("Команда выполнена.");
     }),
     LOGIN(((command, transferPackage) -> {
-        String logPas = (String)command.data.findFirst().get();
-        String[] lpArgs = logPas.split("\\|");
-        User user;
-        if(lpArgs.length == 2)
-            user = new User(lpArgs[0], lpArgs[1], null);
-        else
-            user = new User(lpArgs[0], lpArgs[1], lpArgs[2]);
-        user.setLoggedIn(true);
-        final boolean[] isAlreadyExistNickname = {false};
+        try {
+            String logPas = (String) command.data.findFirst().get();
+            String[] lpArgs = logPas.split("\\|");
+            User user;
+            if (lpArgs.length == 2)
+                user = new User(lpArgs[0], lpArgs[1], null);
+            else
+                user = new User(lpArgs[0], lpArgs[1], lpArgs[2]);
+            user.setLoggedIn(true);
+            final boolean[] isAlreadyExistNickname = {false};
 
-        final boolean[] isUserOnline = {false};
-        UsersVariables.onlineUsers.forEach((k,v)->{
-            if (transferPackage.getUser().equals(k)){
-                isUserOnline[0] = true;
-            }
-        });
+            final boolean[] isUserOnline = {false};
 
-        UsersVariables.users.forEach((k,v)->{
-           if (user.getLogin().equals(k.getLogin())){
-               isAlreadyExistNickname[0] = true;
-           }
-        });
-        if(!isUserOnline[0]) {
-            if (UsersVariables.users.entrySet().stream().map(p -> p.getKey()).collect(Collectors.toList()).contains(user)) {
-                UsersVariables.onlineUsers.put(user, command.getAddress());
-                command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
-                        new byte[]{2})));
-            } else {
-                if (isAlreadyExistNickname[0]) {
-                    command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
-                } else {
-                    UsersVariables.users.put(user, command.getAddress());
+            UsersVariables.onlineUsers.forEach((k, v) -> {
+                if (transferPackage.getUser().equals(k)) {
+                    isUserOnline[0] = true;
+                }
+            });
+
+            /*UsersVariables.users.forEach((k, v) -> {
+                if (user.getLogin().equals(k.getLogin())) {
+                    isAlreadyExistNickname[0] = true;
+                }
+            });*/
+
+            isAlreadyExistNickname[0] = Main.controller.isUserExistsInDB(user);
+
+            if(user.getEmail() != null && isAlreadyExistNickname[0] )
+                command.setData(Stream.of(new TransferPackage(-1, "Пользователь с таким именем существует!", null)));
+            else
+            if (!isUserOnline[0]) {
+                if (Main.controller.isUserCorrectInDB(user)){ //(UsersVariables.users.entrySet().stream().map(p -> p.getKey()).collect(Collectors.toList()).contains(user)) {
                     UsersVariables.onlineUsers.put(user, command.getAddress());
                     command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
-                            new byte[]{1})));
-                    Main.mailSender.send("Регистрация прошла успешно! COOLLAB",
-                            "Спасибо за то, что решили воспользоваться нашим сервисом!\n" +
-                                    "Данные для входа\n" +
-                                    "Логин: " + user.getLogin() + "\n" +
-                                    "Пароль: " + user.getPassword() + "\n" +
-                                    "Будьте осторожны! Не передавайте эти данные третьим лицам!",
-                            user.getEmail());
+                            new byte[]{2})));
+                } else {
+                    if (isAlreadyExistNickname[0]) {
+                        command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
+                    } else {
+                        //UsersVariables.users.put(user, command.getAddress());
+                        Main.controller.addUserToDB(user, command.getAddress());
+                        UsersVariables.onlineUsers.put(user, command.getAddress());
+                        command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
+                                new byte[]{1})));
+                        Main.mailSender.send("Регистрация прошла успешно! COOLLAB",
+                                "Спасибо за то, что решили воспользоваться нашим сервисом!\n" +
+                                        "Данные для входа\n" +
+                                        "Логин: " + user.getLogin() + "\n" +
+                                        "Пароль: " + user.getPassword() + "\n" +
+                                        "Будьте осторожны! Не передавайте эти данные третьим лицам!",
+                                user.getEmail());
+                    }
                 }
-            }
-        }
-        else{
-
-            for(Map.Entry<User, SocketAddress> entry : UsersVariables.onlineUsers.entrySet()){
-                User k = entry.getKey();
-                SocketAddress v = entry.getValue();
-                    if (user.getLogin().equals(k.getLogin())){
+            } else {
+                for (Map.Entry<User, SocketAddress> entry : UsersVariables.onlineUsers.entrySet()) {
+                    User k = entry.getKey();
+                    SocketAddress v = entry.getValue();
+                    if (user.getLogin().equals(k.getLogin())) {
                         command.setData(Stream.of(new TransferPackage(-1, "Вы уже авторизированы!", null)));
                         break;
-                    }else {
+                    } else {
                         UsersVariables.onlineUsers.remove(k);
                         UsersVariables.onlineUsers.put(user, command.getAddress());
                         List<Pair<Costume, String>> colRmItems = Main.getObjectsHashSet().stream().filter(p -> !p.getValue().equals(k.getLogin())).collect(Collectors.toList());
                         Main.getObjectsHashSet().clear();
                         Main.getObjectsHashSet().addAll(colRmItems);
                         System.out.println("Пользователь " + k.getLogin() + " был отключён!");
-                        if (UsersVariables.users.containsKey(user)) {
+                        if (Main.controller.isUserCorrectInDB(user)){ //(UsersVariables.users.containsKey(user)) {
                             UsersVariables.onlineUsers.put(user, command.getAddress());
                             command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
                                     new byte[]{2})));
@@ -388,7 +396,8 @@ public enum Command {
                                 command.setData(Stream.of(new TransferPackage(-1, "Неверный пароль!", null)));
                                 break;
                             } else {
-                                UsersVariables.users.put(user, command.getAddress());
+                                //UsersVariables.users.put(user, command.getAddress());
+                                Main.controller.addUserToDB(user, command.getAddress());
                                 UsersVariables.onlineUsers.put(user, command.getAddress());
                                 command.setData(Stream.of(new TransferPackage(110, "Команда выполнена.", null,
                                         new byte[]{1})));
@@ -402,13 +411,16 @@ public enum Command {
                                 break;
                             }
                         }
+                    }
                 }
             }
+            //UsersVariables.saveUsers();
+            //System.out.println(UsersVariables.users.size());
+            System.out.println("Online: " + UsersVariables.onlineUsers.size());
+            UsersVariables.onlineUsers.forEach((k, v) -> System.out.println(k.toString()));
+        }catch (SQLException e){
+            System.err.println(e.getSQLState());
         }
-        UsersVariables.saveUsers();
-        System.out.println(UsersVariables.users.size());
-        System.out.println("Online: " + UsersVariables.onlineUsers.size());
-        UsersVariables.onlineUsers.forEach((k,v)-> System.out.println(k.toString()));
     })),
     SAVE(((command, transferPackage) -> {
         HashSet<Costume> collection = new HashSet<>();
@@ -492,38 +504,6 @@ public enum Command {
         }else {
             return null;
         }
- //        if(jsonInput.contains("{")){
-//            if (jsonInput.contains("}")) {
-//                Command command = null;
-//                try {
-//                     command = Command.valueOf(jsonInput.split(Pattern.quote("{"))[0].replace(" ", "").toUpperCase());
-//                }
-//                catch (IllegalArgumentException e){ }
-//                if(command != null){
-//                    String data = jsonInput.substring(command.toString().length() + 2, jsonInput.length() - 1);
-//                    command.data = Stream.of(data);
-//                }
-//                return command;
-//            }
-//            else
-//                return null;
-//        }
-//        else{
-//            String mbCmd = jsonInput.replace(" ", "").toUpperCase();
-//            Command command = null;
-//            try {
-//                command = Command.valueOf(mbCmd);
-//            }
-//            catch (IllegalArgumentException e){}
-//            if(command == Command.REMOVE || command == Command.ADD || command == Command.ADD_IF_MAX ||
-//                    command == Command.CHANGE_DEF_FILE_PATH || command == Command.IMPORT){
-//                return null;
-//            }
-//            else {
-//            return command;
-//            }
-//        }
-
     }
 
 
