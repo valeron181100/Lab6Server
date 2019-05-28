@@ -17,6 +17,7 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -75,6 +76,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        /*
         Set<Pair<Costume, String>> collectionFromFile = getCollectionFromFile();
         if(collectionFromFile != null)
             objectsHashSet.addAll(collectionFromFile);
@@ -87,10 +89,14 @@ public class Main {
             }
             objectsHashSet.clear();
             objectsHashSet.addAll(pairs);
-        }, 10, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS);*/
 
         try {
-            UsersVariables.restoreUsers();
+
+            objectsHashSet.clear();
+            objectsHashSet.addAll(controller.getCostumesFromDB());
+
+            //UsersVariables.restoreUsers();
             if(args.length == 0){
                 System.out.println("Введите порт!");
                 System.exit(0);
@@ -131,6 +137,8 @@ public class Main {
         }
         catch (IOException e) {
             System.out.println("Упс, что-то пошло не так!");
+        } catch (SQLException e) {
+            System.err.println("Что-то пошло не так при восстановлении коллекции");
         }
 
     }

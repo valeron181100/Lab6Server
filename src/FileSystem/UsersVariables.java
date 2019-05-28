@@ -20,7 +20,7 @@ public class UsersVariables {
 
     @SuppressWarnings("unchecked")
     public static void restoreUsers(){
-        try (FileInputStream reader = new FileInputStream("users.base");
+        /*try (FileInputStream reader = new FileInputStream("users.base");
              ObjectInputStream ois = new ObjectInputStream(reader)){
 
             users = (ConcurrentHashMap<User, SocketAddress>) ois.readObject();
@@ -29,6 +29,8 @@ public class UsersVariables {
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Что-то пошло не так при восстановлении пользователей!");
         }
+*/
+
 
     }
 }

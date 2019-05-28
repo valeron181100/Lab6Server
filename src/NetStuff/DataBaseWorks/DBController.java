@@ -56,22 +56,24 @@ public class DBController {
         costumes.forEach(this::removeCostumeFromDB);
     }
 
-    public ArrayList<Costume> getCostumesFromDB() throws SQLException {
+    public ArrayList<Pair<Costume,String>> getCostumesFromDB() throws SQLException {
         Pair<PreparedStatement, ResultSet> pair = connector.execSQLQuery("SELECT * FROM costumes;");
         ResultSet set = pair.getValue();
         //Получили id-шники костюмов
-        ArrayList<Integer> costumeKeys = new ArrayList<>();
+        ArrayList<Pair<Integer,String>> costumeKeys = new ArrayList<>();
         while(set.next()){
-            costumeKeys.add(set.getInt("id"));
+            costumeKeys.add(new Pair<>(set.getInt("id"), set.getString(DBConst.COSTUMES_USER)));
         }
         pair.getKey().close();
 
         //Получили костюмы
-        ArrayList<Costume> costumes = new ArrayList<>();
+        ArrayList<Pair<Costume,String>> costumes = new ArrayList<>();
         ArrayList<String> consts = new ArrayList<>(Arrays.asList(DBConst.TOPCLOTHES_TABLE, DBConst.DOWNCLOTHES_TABLE,
                 DBConst.HATS_TABLE, DBConst.SHOES_TABLE, DBConst.UNDERWEAR_TABLE));
-        for (int key : costumeKeys) {
+        for (Pair<Integer,String> mainPair : costumeKeys) {
             Costume costume = new Costume();
+            int key = mainPair.getKey();
+            String login = mainPair.getValue();
             for (String tableName : consts){
                 Pair<PreparedStatement, ResultSet> tablePair = connector.execSQLQuery("SELECT * FROM " + tableName + " WHERE id=" + key +";");
                 ResultSet tableSet = tablePair.getValue();
@@ -114,9 +116,8 @@ public class DBController {
                     }
                 }
             }
-            costumes.add(costume);
+            costumes.add(new Pair<>(costume, login));
         }
-
         return costumes;
     }
 

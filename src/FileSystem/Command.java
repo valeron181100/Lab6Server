@@ -193,6 +193,7 @@ public enum Command {
             HashSet<Costume> mainCollection = (HashSet<Costume>)dis.readObject();
             HashSet<Pair<Costume,String>> collection = new HashSet<>();
             mainCollection.forEach(p -> collection.add(new Pair<>(p, user.getLogin())));
+            collection.forEach(p -> Main.controller.addCostumeToDB(p.getKey(), user));
             command.getObjectsHashSet().addAll(collection);
             command.setData(Stream.of(new TransferPackage(601, "Команда выполнена.", null)));
 
