@@ -1,5 +1,7 @@
 package NetStuff.DataBaseWorks;
 
+import FileSystem.FileLogger;
+import mainpkg.LoadingPrinter;
 import mainpkg.Pair;
 
 import java.sql.*;
@@ -12,18 +14,34 @@ public class JDBCConnector extends DBConfigs {
     private final String USER = dbUser;
     private final String PASS = dbPassword;
 
-    private static final Logger logger = Logger.getLogger(JDBCConnector.class.getSimpleName());
+    private static final FileLogger logger = new FileLogger();
 
     private Connection connection;
 
     public JDBCConnector() {
-        try {
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-        } catch (SQLException | ClassNotFoundException e){
-            e.printStackTrace();
+        LoadingPrinter loadingPrinter = new LoadingPrinter();
+        boolean firstCreation = true;
+        while(true) {
+            try {
+                Class.forName("org.postgresql.Driver");
+                connection = DriverManager.getConnection(DB_URL, USER, PASS);
+                loadingPrinter.stop();
+                System.out.println("\nСоединение с БД установлено!");
+                break;
+            } catch (ClassNotFoundException e) {
+                System.err.println("Ошибка JDBC драйвер не найден!");
+                System.exit(1);
+            } catch (SQLException e) {
+                if (e.getSQLState().equals("08001")) {
+                    if(firstCreation) {
+                        System.out.println("Ошибка: невозможно подключиться к серверу БД, так как сервер не доступен!");
+                        System.out.println("Попытка подключения:");
+                        new Thread(loadingPrinter::printLoadingLine).start();
+                        firstCreation = false;
+                    }
+                }
+            }
         }
-
         String costumes_table = String.format("CREATE TABLE IF NOT EXISTS %s(\n" +
                 "                         %s INT,\n" +
                 "                         %s VARCHAR,\n" +
@@ -137,17 +155,44 @@ public class JDBCConnector extends DBConfigs {
      * @return Pair of PreparedStatement and ResultSet
      */
     public Pair<PreparedStatement, ResultSet> execSQLQuery(String query){
-        try {
-            PreparedStatement statement = connection.
-                    prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnNum = metaData.getColumnCount();
-            int k = 0;
-            return new Pair<>(statement,resultSet);
-        } catch (SQLException e) {
-            logger.info(e.getMessage());
-            return null;
+            try {
+                PreparedStatement statement = connection.
+                        prepareStatement(query);
+                ResultSet resultSet = statement.executeQuery();
+                return new Pair<>(statement, resultSet);
+            } catch (SQLException e) {
+                if (e.getSQLState().equals("08001") || e.getSQLState().equals("08006")) {
+                    resetConnection();
+                    return execSQLQuery(query);
+                }
+                else {
+                    logger.log(e.getMessage() + "\nSqlState = " + e.getSQLState());
+                    return null;
+                }
+            }
+    }
+
+    private boolean resetConnection(){
+        LoadingPrinter loadingPrinter = new LoadingPrinter();
+        boolean firstCreation = true;
+        while(true) {
+            try {
+                Class.forName("org.postgresql.Driver");
+                connection = DriverManager.getConnection(DB_URL, USER, PASS);
+                loadingPrinter.stop();
+                System.out.println("\nСоединение с БД установлено!");
+                return true;
+            } catch (ClassNotFoundException e) {
+                System.err.println("Ошибка JDBC драйвер не найден!");
+                System.exit(1);
+            } catch (SQLException e) {
+                if (e.getSQLState().equals("08001")) {
+                    if(firstCreation) {
+                        new Thread(loadingPrinter::printLoadingLine).start();
+                        firstCreation = false;
+                    }
+                }
+            }
         }
     }
 
@@ -157,8 +202,14 @@ public class JDBCConnector extends DBConfigs {
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            logger.info(e.getMessage());
-            return false;
+            if (e.getSQLState().equals("08001") || e.getSQLState().equals("08006")) {
+                resetConnection();
+                return execSQLUpdate(query);
+            }
+            else {
+                logger.log(e.getMessage() + "\nSqlState = " + e.getSQLState());
+                return false;
+            }
         }
     }
 }
