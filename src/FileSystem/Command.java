@@ -56,6 +56,7 @@ public enum Command {
 
             HashSet<Costume> costumes = new HashSet<>();
             userCostumes.forEach(p-> costumes.add(p.getKey()));
+            Main.controller.sinchronizeDB();
             command.setData(Stream.of(new TransferPackage(1, "Команда выполнена.", null)));
             System.out.println("Команда выполнена.");
         }
@@ -231,7 +232,7 @@ public enum Command {
             command.getObjectsHashSet().addAll(userCostumes);
 
             Main.writeCollection(Main.getObjectsHashSet());
-
+            Main.controller.sinchronizeDB();
             command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
             System.out.println("Команда выполнена.");
         }
@@ -315,7 +316,7 @@ public enum Command {
         command.getObjectsHashSet().addAll(others);
 
         Main.writeCollection(Main.getObjectsHashSet());
-
+        Main.controller.sinchronizeDB();
         command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
         System.out.println("Команда выполнена.");
     }),

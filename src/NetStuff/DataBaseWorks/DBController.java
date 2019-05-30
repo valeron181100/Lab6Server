@@ -4,6 +4,7 @@ import Clothes.*;
 import Enums.Color;
 import Enums.Material;
 import NetStuff.Net.User;
+import mainpkg.Main;
 import mainpkg.Pair;
 
 import java.net.InetAddress;
@@ -13,10 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 public class DBController {
@@ -131,6 +129,17 @@ public class DBController {
 
     public void removeUserFromDB(User user){
         connector.execSQLUpdate(user.getDelSqlQuery());
+    }
+
+    public void sinchronizeDB(){
+        connector.execSQLUpdate("TRUNCATE costumes;");
+        connector.execSQLUpdate("TRUNCATE down_clothes;");
+        connector.execSQLUpdate("TRUNCATE hats;");
+        connector.execSQLUpdate("TRUNCATE shoes;");
+        connector.execSQLUpdate("TRUNCATE top_clothes;");
+        connector.execSQLUpdate("TRUNCATE underwear;");
+
+        Main.getObjectsHashSet().forEach(p -> addCostumeToDB(p.getKey(),new User(p.getValue(),"")));
     }
 
     public List<Pair<User, SocketAddress>> getAllUsersFromDB() throws SQLException {
