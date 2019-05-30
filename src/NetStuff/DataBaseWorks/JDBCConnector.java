@@ -1,12 +1,9 @@
 package NetStuff.DataBaseWorks;
 
-import FileSystem.FileLogger;
 import mainpkg.LoadingPrinter;
 import mainpkg.Pair;
 
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class JDBCConnector extends DBConfigs {
 

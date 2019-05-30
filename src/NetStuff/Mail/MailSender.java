@@ -26,6 +26,8 @@ public class MailSender {
         props.put("mail.smtp.port", service.getPort());
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.socketFactory.port", service.getPort());
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
         Session session = Session.getDefaultInstance(props, new Authenticator() {
             @Override

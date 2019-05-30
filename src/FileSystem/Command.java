@@ -347,6 +347,11 @@ public enum Command {
 
             isAlreadyExistNickname[0] = Main.controller.isUserExistsInDB(user);
 
+            if(!isAlreadyExistNickname[0] && user.getEmail() == null){
+                command.setData(Stream.of(new TransferPackage(-1, "Пользователь с таким именем не существует! Сначала зарегистрируйтесь!", null)));
+                return;
+            }
+
             if(user.getEmail() != null && isAlreadyExistNickname[0] )
                 command.setData(Stream.of(new TransferPackage(-1, "Пользователь с таким именем существует!", null)));
             else

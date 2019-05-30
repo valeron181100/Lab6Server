@@ -1,4 +1,4 @@
-package FileSystem;
+package NetStuff.DataBaseWorks;
 
 import java.io.FileWriter;
 import java.io.IOException;

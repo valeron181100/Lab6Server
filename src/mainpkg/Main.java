@@ -93,14 +93,14 @@ public class Main {
 
         try {
 
-            objectsHashSet.clear();
-            objectsHashSet.addAll(controller.getCostumesFromDB());
-
             //UsersVariables.restoreUsers();
             if(args.length == 0){
                 System.out.println("Введите порт!");
                 System.exit(0);
             }
+
+            objectsHashSet.clear();
+            objectsHashSet.addAll(controller.getCostumesFromDB());
 
             int port = Integer.parseInt(args[0]);
 

@@ -57,11 +57,17 @@ public class ServerThreadHandler implements Runnable {
             SocketAddress adress = channel.receive(buffer);
             client.setAdress(adress);
             TransferPackage recieved = TransferPackage.restoreObject(new ByteArrayInputStream(buffer.array()));
+            if(recieved.getId() == 763){
+                key.interestOps(SelectionKey.OP_READ);
+                return;
+            }
+
             if(recieved.getId() == TransferCommandID.CheckingConnectionTP.getId()){
                 client.setaPackage(recieved);
                 key.interestOps(SelectionKey.OP_WRITE);
                 return;
             }
+
             if(recieved.getId() == 111){
                 try(ByteArrayInputStream bais = new ByteArrayInputStream(recieved.getAdditionalData());
                     ObjectInputStream ois = new ObjectInputStream(bais)){
@@ -77,6 +83,9 @@ public class ServerThreadHandler implements Runnable {
                 }
                 return;
             }
+
+
+
             if (recieved.getAdditionalData() != null && recieved.getCmdData().equals("load"))
                 recieved.setData(CollectionManager.getCollectionFromXML(new String(recieved.getAdditionalData(), Main.DEFAULT_CHAR_SET)).stream());
             final User[] user = new User[1];
