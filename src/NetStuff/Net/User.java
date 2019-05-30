@@ -1,6 +1,7 @@
 package NetStuff.Net;
 
 import NetStuff.DataBaseWorks.DBConst;
+import NetStuff.DataBaseWorks.Hash.StringHasher;
 import NetStuff.DataBaseWorks.iQuery;
 import mainpkg.Main;
 
@@ -50,6 +51,12 @@ public class User implements Serializable, iQuery {
     }
 
     public String getPassword() {
+        StringHasher stringHasher = new StringHasher("SHA-384");
+        String res = stringHasher.getHash(password);
+        return res;
+    }
+
+    public String getUncryptedPassword() {
         return password;
     }
 

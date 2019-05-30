@@ -124,7 +124,8 @@ public class DBController {
     }
 
     public void addUserToDB(User user, SocketAddress address){
-        connector.execSQLUpdate(user.getInsertSqlQuery().replace("ADDRESS", ((InetSocketAddress)address).getAddress().toString() + "|" + ((InetSocketAddress)address).getPort()));
+        String query = user.getInsertSqlQuery().replace("ADDRESS", ((InetSocketAddress)address).getAddress().toString() + "|" + ((InetSocketAddress)address).getPort());
+        connector.execSQLUpdate(query);
     }
 
     public void removeUserFromDB(User user){
@@ -182,7 +183,7 @@ public class DBController {
         Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT users.login FROM users;");
         ResultSet set = resultPair.getValue();
         try {
-            if (set.next()) {
+            while (set.next()) {
                 if (set.getString("login").equals(user.getLogin())) {
                     return true;
                 }
@@ -195,7 +196,7 @@ public class DBController {
         Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT users.login, users.password FROM users;");
         ResultSet set = resultPair.getValue();
         try {
-            if (set.next()) {
+            while (set.next()) {
                 if (set.getString("login").equals(user.getLogin()) && set.getString("password").equals(user.getPassword())) {
                     return true;
                 }
