@@ -12,6 +12,7 @@ public class JDBCConnector extends DBConfigs {
     private final String USER = dbUser;
     private final String PASS = dbPassword;
 
+
     private static final FileLogger logger = new FileLogger();
 
     private Connection connection;
