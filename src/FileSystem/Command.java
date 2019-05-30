@@ -27,6 +27,7 @@ public enum Command {
     @SuppressWarnings("unchecked")
     REMOVE((command,transferPackage) ->{
         try{
+            Main.controller.synchronyzeDB();
             String strData = "";
             for(Object s : command.data.toArray()) strData += s.toString();
             if(strData.length() == 0) {
@@ -56,7 +57,7 @@ public enum Command {
 
             HashSet<Costume> costumes = new HashSet<>();
             userCostumes.forEach(p-> costumes.add(p.getKey()));
-            Main.controller.sinchronizeDB();
+            Main.controller.reloadCollectionToDB();
             command.setData(Stream.of(new TransferPackage(1, "Команда выполнена.", null)));
             System.out.println("Команда выполнена.");
         }
@@ -68,6 +69,7 @@ public enum Command {
     }),
 
     SHOW((command,transferPackage)->{
+        Main.controller.synchronyzeDB();
         command.setData(null);
         User user = transferPackage.getUser();
 
@@ -82,7 +84,7 @@ public enum Command {
     }),
     ADD_IF_MAX((command,transferPackage)->{
         try {
-
+            Main.controller.synchronyzeDB();
             // Now data has a Costume object in json format
             String strData = "";
             for (Object s : command.data.toArray()) strData += s.toString();
@@ -122,6 +124,7 @@ public enum Command {
 
             Main.writeCollection(Main.getObjectsHashSet());
 
+            Main.controller.reloadCollectionToDB();
             command.setData(Stream.of(new TransferPackage(3, "Команда выполнена.", null)));
             // Now data has Transfer Package for sending
             System.out.println("Команда выполнена.");
@@ -132,6 +135,7 @@ public enum Command {
         }
     }),
     LOAD((command,transferPackage)->{
+        Main.controller.synchronyzeDB();
         User user = transferPackage.getUser();
         Stream<Pair<Costume, String>> concatStream = Stream.concat(command.getObjectsHashSet().stream(), transferPackage.getData().map(p -> new Pair<>(p, user.getLogin())));
         HashSet<Pair<Costume, String>> set = new HashSet<>(concatStream.collect(Collectors.toSet()));
@@ -143,6 +147,7 @@ public enum Command {
     }),
     INFO((command,transferPackage)->{
 
+        Main.controller.synchronyzeDB();
         HashSet<Costume> collection = new HashSet<>();
 
         User user = transferPackage.getUser();
@@ -185,6 +190,7 @@ public enum Command {
 
     @SuppressWarnings("unchecked")
     I1A8S1D1F0G0H((command,transferPackage)->{
+        Main.controller.synchronyzeDB();
         System.err.println("I am hereeee");
 
         User user = transferPackage.getUser();
@@ -205,6 +211,7 @@ public enum Command {
 
     ADD((command,transferPackage)->{
         try {
+            Main.controller.synchronyzeDB();
             String strData = "";
             for (Object s : command.data.toArray()) strData += s.toString();
             if(strData.length() == 0) {
@@ -232,7 +239,7 @@ public enum Command {
             command.getObjectsHashSet().addAll(userCostumes);
 
             Main.writeCollection(Main.getObjectsHashSet());
-            Main.controller.sinchronizeDB();
+            Main.controller.reloadCollectionToDB();
             command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
             System.out.println("Команда выполнена.");
         }
@@ -243,6 +250,7 @@ public enum Command {
     }),
     START((command,transferPackage)->{
 
+        Main.controller.synchronyzeDB();
         User user = transferPackage.getUser();
 
         HashSet<Costume> collection = new HashSet<>();
@@ -299,6 +307,7 @@ public enum Command {
         command.setData(Stream.of(new TransferPackage(10, "Команда выполнена.", null, strData.getBytes(Main.DEFAULT_CHAR_SET))));
     })),
     TRIMTOMIN((command,transferPackage) -> {
+        Main.controller.synchronyzeDB();
         HashSet<Pair<Costume, String>> collection = new HashSet<>();
 
         User user = transferPackage.getUser();
@@ -316,12 +325,13 @@ public enum Command {
         command.getObjectsHashSet().addAll(others);
 
         Main.writeCollection(Main.getObjectsHashSet());
-        Main.controller.sinchronizeDB();
+        Main.controller.reloadCollectionToDB();
         command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
         System.out.println("Команда выполнена.");
     }),
     LOGIN(((command, transferPackage) -> {
         try {
+            Main.controller.synchronyzeDB();
             String logPas = (String) command.data.findFirst().get();
             String[] lpArgs = logPas.split("\\|");
             User user;
@@ -430,6 +440,7 @@ public enum Command {
         }
     })),
     SAVE(((command, transferPackage) -> {
+        Main.controller.synchronyzeDB();
         HashSet<Costume> collection = new HashSet<>();
 
         User user = transferPackage.getUser();

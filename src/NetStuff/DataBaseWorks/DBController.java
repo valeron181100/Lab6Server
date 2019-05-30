@@ -131,7 +131,7 @@ public class DBController {
         connector.execSQLUpdate(user.getDelSqlQuery());
     }
 
-    public void sinchronizeDB(){
+    public void reloadCollectionToDB(){
         connector.execSQLUpdate("TRUNCATE costumes;");
         connector.execSQLUpdate("TRUNCATE down_clothes;");
         connector.execSQLUpdate("TRUNCATE hats;");
@@ -140,6 +140,27 @@ public class DBController {
         connector.execSQLUpdate("TRUNCATE underwear;");
 
         Main.getObjectsHashSet().forEach(p -> addCostumeToDB(p.getKey(),new User(p.getValue(),"")));
+    }
+
+    public void synchronyzeDB(){
+        Pair<PreparedStatement, ResultSet> resultPair = connector.execSQLQuery("SELECT COUNT(id) FROM costumes;");
+        ResultSet set = resultPair.getValue();
+        boolean iseq = false;
+        try{
+            while (set.next())
+                iseq = set.getInt("count") == Main.objectsHashSet.size();
+        } catch (SQLException e) {
+            iseq = false;
+        }
+
+        if(!iseq){
+            Main.objectsHashSet.clear();
+            try {
+                Main.objectsHashSet.addAll(getCostumesFromDB());
+            } catch (SQLException e) {
+                System.err.println("Не удалось синхронизироваться с БД!");
+            }
+        }
     }
 
     public List<Pair<User, SocketAddress>> getAllUsersFromDB() throws SQLException {

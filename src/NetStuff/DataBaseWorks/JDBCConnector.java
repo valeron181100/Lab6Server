@@ -1,6 +1,7 @@
 package NetStuff.DataBaseWorks;
 
 import mainpkg.LoadingPrinter;
+import mainpkg.Main;
 import mainpkg.Pair;
 
 import java.sql.*;
