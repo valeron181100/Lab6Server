@@ -384,7 +384,7 @@ public enum Command {
                                 "Спасибо за то, что решили воспользоваться нашим сервисом!\n" +
                                         "Данные для входа\n" +
                                         "Логин: " + user.getLogin() + "\n" +
-                                        "Пароль: " + user.getUncryptedPassword() + "\n" +
+                                        "Пароль: " + user.getUncryptedPassword().substring(8) + "\n" +
                                         "Будьте осторожны! Не передавайте эти данные третьим лицам!",
                                 user.getEmail());
                     }
@@ -422,7 +422,7 @@ public enum Command {
                                         "Спасибо за то, что решили воспользоваться нашим сервисом!\n" +
                                                 "Данные для входа\n" +
                                                 "Логин: " + user.getLogin() + "\n" +
-                                                "Пароль: " + user.getUncryptedPassword() + "\n" +
+                                                "Пароль: " + user.getUncryptedPassword().substring(8) + "\n" +
                                                 "Будьте осторожны! Не передавайте эти данные третьим лицам!",
                                         user.getEmail());
                                 break;

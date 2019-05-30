@@ -52,7 +52,7 @@ public class User implements Serializable, iQuery {
 
     public String getPassword() {
         StringHasher stringHasher = new StringHasher("SHA-384");
-        String res = stringHasher.getHash(password);
+        String res = stringHasher.getHash(password + "KTVBJNWT");
         return res;
     }
 
