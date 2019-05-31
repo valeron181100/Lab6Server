@@ -25,6 +25,7 @@ public class MailSender {
         props.put("mail.smtp.host", service.getHost());
         props.put("mail.smtp.port", service.getPort());
         props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.connectiontimeout", "1000");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.socketFactory.port", service.getPort());
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
