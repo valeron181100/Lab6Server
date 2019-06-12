@@ -1,14 +1,13 @@
-package NetStuff.DataBaseWorks;
+package val.bond.applogic.NetStuff.DataBaseWorks;
 
-import mainpkg.LoadingPrinter;
-import mainpkg.Main;
-import mainpkg.Pair;
+import val.bond.applogic.mainpkg.LoadingPrinter;
+import val.bond.applogic.mainpkg.Pair;
 
 import java.sql.*;
 
 public class JDBCConnector extends DBConfigs {
 
-    private final String DB_URL = "jdbc:postgresql://"+dbHost+(dbPort.length() == 0 ?"":":"+dbPort)+"/" + dbName;
+    private final String DB_URL = "jdbc:postgresql://"+dbHost+":"+dbPort+"/" + dbName;
     private final String USER = dbUser;
     private final String PASS = dbPassword;
 
