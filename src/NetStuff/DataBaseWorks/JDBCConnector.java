@@ -8,7 +8,7 @@ import java.sql.*;
 
 public class JDBCConnector extends DBConfigs {
 
-    private final String DB_URL = "jdbc:postgresql://"+dbHost+":"+dbPort+"/" + dbName;
+    private final String DB_URL = "jdbc:postgresql://"+dbHost+(dbPort.length() == 0 ?"":":"+dbPort)+"/" + dbName;
     private final String USER = dbUser;
     private final String PASS = dbPassword;
 
