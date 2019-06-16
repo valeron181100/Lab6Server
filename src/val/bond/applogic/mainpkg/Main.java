@@ -1,6 +1,7 @@
 package val.bond.applogic.mainpkg;
 
 import val.bond.applogic.Clothes.Costume;
+import val.bond.applogic.FileSystem.UsersVariables;
 import val.bond.applogic.NetStuff.DataBaseWorks.DBController;
 import val.bond.applogic.NetStuff.DataBaseWorks.JDBCConnector;
 import val.bond.applogic.NetStuff.Mail.MailSender;
@@ -84,6 +85,8 @@ public class Main {
         }, 10, TimeUnit.SECONDS);*/
 
         try {
+
+            Runtime.getRuntime().addShutdownHook(new Thread(UsersVariables::shutdownServerSendPackage));
 
             //UsersVariables.restoreUsers();
             if(args.length == 0){

@@ -30,6 +30,11 @@ login {loginStr} {passwordStr}: залогиннится на сервере.(П
 save: сохранить коллекцию с сервера //12
 
 
+Комманда show была переделан в следующий формат:
+show {userName} {} - выводит все костюмы пользователя кратко
+show {} {} - выводит все костюмы всех пользователей кратко
+show {} {costume_id} - выводит подробную информацию о костюме с id = costume_id
+
 {"topClothes":{"growth_sm":170,"size":50,"color":"White","material":"Chlopoc","is_hood":false,"name":"T-Shirt","is_for_man":true,"hand_sm_length":60},"downClothes":{"size":50,"color":"Black","material":"Chlopoc","diametr_leg_sm":40,"name":"Trousers","leg_length_sm":70,"is_for_man":true},"underwear":{"sex_lvl":99,"size":25,"color":"Red","material":"Chlopoc","name":"Panties","is_for_man":true},"hat":{"cylinder_height_sm":15,"size":50,"color":"White","material":"Len","visor_length_sm":20,"name":"BaseballHat","is_for_man":true},"shoes":{"is_shoelaces":true,"size":38,"color":"White","material":"Leather","outsole_material":"Rubber","name":"Sneackers","is_for_man":true}}
 
 Empty Transfer Package //666
@@ -45,7 +50,11 @@ Logging Package //110
 
 Disconnecting //111
 
+Collection updating show command //156
+
 Reconnected //228
+
+Server Shuted Down //9999
 
 json regex:
 

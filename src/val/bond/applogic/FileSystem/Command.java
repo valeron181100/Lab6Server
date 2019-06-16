@@ -1,5 +1,6 @@
 package val.bond.applogic.FileSystem;
 
+import org.json.JSONArray;
 import val.bond.applogic.Clothes.Costume;
 import val.bond.applogic.NetStuff.Net.TransferPackage;
 import val.bond.applogic.NetStuff.Net.User;
@@ -56,6 +57,7 @@ public enum Command {
             userCostumes.forEach(p-> costumes.add(p.getKey()));
             Main.controller.reloadCollectionToDB();
             command.setData(Stream.of(new TransferPackage(1, "Команда выполнена.", null)));
+            UsersVariables.showSendPackage();
             System.out.println("Команда выполнена.");
         }
         catch (JSONException e){
@@ -67,15 +69,83 @@ public enum Command {
 
     SHOW((command,transferPackage)->{
         Main.controller.synchronyzeDB();
-        command.setData(null);
         User user = transferPackage.getUser();
+        List<String> dataList = (List<String>)command.data.collect(Collectors.toList());
+        int k = 0;
+        command.setData(null);
 
-        Set<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user.getLogin())).collect(Collectors.toSet());
-        final String[] output = {""};
+        if(dataList.get(0).length() == 0 && dataList.get(1).length() == 0){
+            JSONArray response = new JSONArray();
+            try {
+                ArrayList<Pair<Costume, String>> costumes = Main.controller.showCostumesFromDB();
 
-        userStream.forEach(p -> output[0] += p.getKey().toString() + "\t");
+                costumes.forEach(p->{
+                    JSONObject costumeData = new JSONObject();
+                    costumeData.put("costumeId", Integer.parseInt(p.getValue().split(":")[0]));
+                    costumeData.put("costumeName", p.getKey().toString());
+                    costumeData.put("costumeLogin", p.getValue().split(":")[1]);
+                    response.put(costumeData);
+                });
 
-        command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, output[0].getBytes(Main.DEFAULT_CHAR_SET))));
+            } catch (SQLException e) {
+                System.err.println(e.getSQLState() + e.getMessage());
+            }
+
+            JSONObject sending = new JSONObject();
+            sending.put("array",response);
+            command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, sending.toString().getBytes(Main.DEFAULT_CHAR_SET))));
+        }
+
+        if(dataList.get(0).length() != 0 && dataList.get(1).length() == 0){
+            JSONArray response = new JSONArray();
+            try {
+                ArrayList<Pair<Costume, String>> costumes = Main.controller.showCostumesFromDB();
+                List<Pair<Costume, String>> collect = costumes.stream().filter(p -> p.getValue().split(":")[1].equals(dataList.get(0))).collect(Collectors.toList());
+
+                collect.forEach(p->{
+                    JSONObject costumeData = new JSONObject();
+                    costumeData.put("costumeId", Integer.parseInt(p.getValue().split(":")[0]));
+                    costumeData.put("costumeName", p.getKey().toString());
+                    costumeData.put("costumeLogin", p.getValue().split(":")[1]);
+                    response.put(costumeData);
+                });
+
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+            JSONObject sending = new JSONObject();
+            sending.put("array",response);
+            command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, sending.toString().getBytes(Main.DEFAULT_CHAR_SET))));
+        }
+
+        if(dataList.get(0).length() == 0 && dataList.get(1).length() != 0){
+            StringBuilder response = new StringBuilder();
+            try {
+                ArrayList<Pair<Costume, String>> costumes = Main.controller.showCostumesFromDB();
+                List<Pair<Costume, String>> collect = costumes.stream().filter(p -> p.getValue().split(":")[0].equals(dataList.get(1))).collect(Collectors.toList());
+
+                JSONArray array = new JSONArray();
+
+                collect.forEach(p->{
+                    JSONObject costumeObject = p.getKey().getJson();
+                    JSONObject costumeData = new JSONObject();
+                    costumeData.put("costumeId", Integer.parseInt(p.getValue().split(":")[0]));
+                    costumeData.put("costumeLogin", p.getValue().split(":")[1]);
+                    JSONObject data = new JSONObject();
+                    data.put("costumeObject", costumeObject);
+                    data.put("costumeData", costumeData);
+                    response.append(data.toString());
+                });
+
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+
+            command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, response.toString().getBytes(Main.DEFAULT_CHAR_SET))));
+        }
+       // Set<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user.getLogin())).collect(Collectors.toSet());
+
+       // command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, output[0].getBytes(Main.DEFAULT_CHAR_SET))));
 
         System.out.println("Команда выполнена.");
     }),
@@ -124,6 +194,7 @@ public enum Command {
             Main.controller.reloadCollectionToDB();
             command.setData(Stream.of(new TransferPackage(3, "Команда выполнена.", null)));
             // Now data has Transfer Package for sending
+            UsersVariables.showSendPackage();
             System.out.println("Команда выполнена.");
         }
         catch (JSONException e){
@@ -140,6 +211,7 @@ public enum Command {
         Main.controller.addAllCostumesToDB(set.stream().map(p -> p.getKey()).collect(Collectors.toSet()), user);
         command.setData(Stream.of(new TransferPackage(4, "Команда выполнена.", null, "Load collection to server".getBytes(Main.DEFAULT_CHAR_SET))));
         Main.writeCollection(Main.getObjectsHashSet());
+        UsersVariables.showSendPackage();
         System.out.println("Команда выполнена.");
     }),
     INFO((command,transferPackage)->{
@@ -200,7 +272,7 @@ public enum Command {
             collection.forEach(p -> Main.controller.addCostumeToDB(p.getKey(), user));
             command.getObjectsHashSet().addAll(collection);
             command.setData(Stream.of(new TransferPackage(601, "Команда выполнена.", null)));
-
+            UsersVariables.showSendPackage();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println(e.getMessage());
         }
@@ -238,6 +310,7 @@ public enum Command {
             Main.writeCollection(Main.getObjectsHashSet());
             Main.controller.reloadCollectionToDB();
             command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
+            UsersVariables.showSendPackage();
             System.out.println("Команда выполнена.");
         }
         catch (JSONException e){
@@ -324,6 +397,7 @@ public enum Command {
         Main.writeCollection(Main.getObjectsHashSet());
         Main.controller.reloadCollectionToDB();
         command.setData(Stream.of(new TransferPackage(7, "Команда выполнена.", null)));
+        UsersVariables.showSendPackage();
         System.out.println("Команда выполнена.");
     }),
     LOGIN(((command, transferPackage) -> {
@@ -480,7 +554,7 @@ public enum Command {
 
         String jsonRegex = "\\{\"topClothes\":\\{\"growth_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"is_hood\":(true|false),\"name\":\"(.+)\",\"is_for_man\":(true|false),\"hand_sm_length\":(\\d+)},\"downClothes\":\\{\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"diametr_leg_sm\":(\\d+),\"name\":\"(.+)\",\"leg_length_sm\":(\\d+),\"is_for_man\":(true|false)},\"underwear\":\\{\"sex_lvl\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"(.+)\",\"is_for_man\":(true|false)},\"hat\":\\{\"cylinder_height_sm\":(\\d+),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"visor_length_sm\":(\\d+),\"name\":\"(.+)\",\"is_for_man\":(true|false)},\"shoes\":\\{\"is_shoelaces\":(true|false),\"size\":(\\d+),\"color\":\"(White|Black|Green|Purple|Blonde|Blue|Red|Orange|Gray|Brown)\",\"material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"outsole_material\":\"(Chlopoc|Leather|Wool|Sintetic|Chlopoc|Len|Rubber)\",\"name\":\"(.+)\",\"is_for_man\":(true|false)}}";
         String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.+}";
-        String nodataCommandRegex = "show|load|info|start|exit|help|save|I1A8S1D1F0G0H|trimToMin";
+        String nodataCommandRegex = "load|info|start|exit|help|save|I1A8S1D1F0G0H|trimToMin";
         String loginRegex = "login \\{.+} \\{.+}( \\{.+})?";
 
         if(jsonInput.matches(dataCommandRegex)){
@@ -517,7 +591,17 @@ public enum Command {
                 ));
             return command;
         }else {
-            return null;
+            if(jsonInput.startsWith("show")){
+                Command command = Command.SHOW;
+                String[] showParts = jsonInput.split(" ");
+                String[] showData = new String[2];
+                showData[0] = showParts[1].substring(1, showParts[1].length() - 1);
+                showData[1] = showParts[2].substring(1, showParts[2].length() - 1);
+                command.setData(Arrays.stream(showData));
+                return command;
+            }else {
+                return null;
+            }
         }
     }
 
