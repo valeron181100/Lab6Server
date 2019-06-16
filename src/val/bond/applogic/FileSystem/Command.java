@@ -521,6 +521,18 @@ public enum Command {
 
         command.setData(Stream.of(new TransferPackage(12, "Команда выполнена.", null,
                 CollectionManager.getBytesFromCollection(collection))));
+    })),
+    EDIT(((command, transferPackage) -> {
+        @SuppressWarnings("unchecked")
+        List<String> cmdData = (List<String>) command.data.collect(Collectors.toList());
+
+        String query = "UPDATE " + cmdData.get(1) + " SET " + cmdData.get(2) + "=" + cmdData.get(3) + " WHERE id=" + cmdData.get(0);
+
+        Main.jdbcConnector.execSQLUpdate(query);
+
+        Main.controller.synchronyzeDB();
+
+        command.setData(Stream.of(new TransferPackage(13, "Команда выполнена.", null)));
     }));
 
     Command(ICommand cmd){
@@ -556,6 +568,7 @@ public enum Command {
         String dataCommandRegex = "(remove|add_if_max|import|add|change_def_file_path) \\{.+}";
         String nodataCommandRegex = "load|info|start|exit|help|save|I1A8S1D1F0G0H|trimToMin";
         String loginRegex = "login \\{.+} \\{.+}( \\{.+})?";
+        String editRegex = "edit \\{-?\\d+} \\{(top_clothes|down_clothes|underwear|hats|shoes)\\.(\\w+)} \\{(\\w+)}";
 
         if(jsonInput.matches(dataCommandRegex)){
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();
@@ -600,7 +613,20 @@ public enum Command {
                 command.setData(Arrays.stream(showData));
                 return command;
             }else {
-                return null;
+                if(jsonInput.matches(editRegex)){
+                    Command command = Command.EDIT;
+                    String[] editParts = jsonInput.split(" ");
+                    String[] editData = new String[4];
+                    editData[0] = editParts[1].substring(1, editParts[1].length() - 1);
+                    String costumeFields = editParts[2].substring(1, editParts[2].length() - 1);
+                    editData[1] = costumeFields.split("\\.")[0];
+                    editData[2] = costumeFields.split("\\.")[1];
+                    editData[3] = editParts[3].substring(1, editParts[3].length() - 1);
+                    command.setData(Arrays.stream(editData));
+                    return command;
+                }else {
+                    return null;
+                }
             }
         }
     }
