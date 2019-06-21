@@ -33,8 +33,20 @@ public enum Command {
                         "Отсутствует аргумент команды!".getBytes(Main.DEFAULT_CHAR_SET))));
                 return;
             }
-            JSONObject jsonObject = new JSONObject(strData);
-            Costume costume = new Costume(jsonObject);
+
+            StringBuilder response = new StringBuilder();
+            List<Pair<Costume, String>> collect = new ArrayList<>();
+            try {
+                ArrayList<Pair<Costume, String>> costumes = Main.controller.showCostumesFromDB();
+                String finalStrData = strData;
+                collect.addAll(costumes.stream().filter(p -> p.getValue().split(":")[0].equals(finalStrData)).collect(Collectors.toList()));
+
+
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+
+            Costume costume = collect.get(0).getKey();
 
             command.setData(null);
             SocketAddress adress = command.getAddress();
@@ -141,7 +153,7 @@ public enum Command {
                 System.err.println(e.getMessage());
             }
 
-            command.setData(Stream.of(new TransferPackage(2, "Команда выполнена.",null, response.toString().getBytes(Main.DEFAULT_CHAR_SET))));
+            command.setData(Stream.of(new TransferPackage(322, "Команда выполнена.",null, response.toString().getBytes(Main.DEFAULT_CHAR_SET))));
         }
        // Set<Pair<Costume, String>> userStream = command.getObjectsHashSet().stream().filter(p -> p.getValue().equals(user.getLogin())).collect(Collectors.toSet());
 
@@ -246,15 +258,26 @@ public enum Command {
         System.out.println("Команда выполнена.");
     }),
     IMPORT((command,transferPackage)->{
-        String path = "";
-        for(Object s : command.data.toArray()) path += s.toString();
-        if(path.length() == 0) {
+        Main.controller.synchronyzeDB();
+        String xml = "";
+        for(Object s : command.data.toArray()) xml += s.toString();
+        if(xml.length() == 0) {
             command.setData(Stream.of(new TransferPackage(-1, "Команда не выполнена.", null,
                     "Отсутствует аргумент команды!".getBytes(Main.DEFAULT_CHAR_SET))));
             return;
         }
-        command.setData(Stream.of(new TransferPackage(6, "Команда выполнена.", null, path.getBytes(Main.DEFAULT_CHAR_SET))));
-        System.out.println("Первый этап импорта пройден.");
+        HashSet<Costume> collectionFromXML = null;
+        try {
+            collectionFromXML = CollectionManager.getCollectionFromXML(xml);
+        } catch (EmptyFileException e) {
+            System.err.println(e.getMessage());
+        }
+        collectionFromXML.forEach(p -> Main.objectsHashSet.add(new Pair<>(p, transferPackage.getUser().getLogin())));
+
+        Main.writeCollection(Main.getObjectsHashSet());
+        Main.controller.reloadCollectionToDB();
+        UsersVariables.showSendPackage();
+        command.setData(Stream.of(new TransferPackage(6, "Команда выполнена.", null)));
     }),
 
     @SuppressWarnings("unchecked")
@@ -574,13 +597,21 @@ public enum Command {
             String cmd = findMatches("(remove|add_if_max|import|add|change_def_file_path)", jsonInput).get(0).toUpperCase();
             String data;
             if(cmd.equals("IMPORT") || cmd.equals("CHANGE_DEF_FILE_PATH")){
-                data = jsonInput.split(" ")[1].substring(1, jsonInput.split(" ")[1].length() - 1);
+                if(cmd.equals("IMPORT")){
+                    data = jsonInput.substring(8, jsonInput.length() - 1);
+                }
+                else
+                    data = jsonInput.split(" ")[1].substring(1, jsonInput.split(" ")[1].length() - 1);
             } else{
                 ArrayList<String> list = findMatches(jsonRegex, jsonInput);
                 if (list.size() != 0)
                     data = list.get(0);
                 else
-                    return null;
+                    if(jsonInput.matches("remove \\{-?\\d+}")){
+                        data = jsonInput.split(" ")[1].substring(1, jsonInput.split(" ")[1].length() - 1);
+                    }
+                    else
+                        return null;
             }
             Command command = Command.valueOf(cmd);
             command.setData(Stream.of(data));

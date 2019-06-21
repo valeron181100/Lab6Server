@@ -31,6 +31,8 @@ save: сохранить коллекцию с сервера //12
 
 edit {costume_id} {costume_field.field_of_costume_field}: редактирует указанную характеристику объекта коллекции //13
 
+Комманда import была переделана в следующий формат:
+import {String xml} - String xml-строка с коллекцией из файла
 
 Комманда show была переделан в следующий формат:
 show {userName} {} - выводит все костюмы пользователя кратко
@@ -55,6 +57,8 @@ Disconnecting //111
 Collection updating show command //156
 
 Reconnected //228
+
+show Command for showing detail info about costume by costume_id //322
 
 Server Shuted Down //9999
 
